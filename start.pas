@@ -3,19 +3,19 @@ program Projet;
 uses fpjson, jsonparser, Crt;
 
 
-Type carte = Record
+Type carte = Record // L'une des 52 cartes du jeu
     couleur:string;
     valeur:integer;
     end;
 
-Type joueur=Record
+Type joueur=Record // L'un des joueurs
     cartes:array of carte;
     pseudo:string;
     age:integer;
     couleur:byte;
     end;
 
-Type config = Record
+Type config = Record // configuration de la partie
     players:integer;
     win_defaut:integer;
     win:integer;
@@ -24,14 +24,15 @@ Type config = Record
     max_age:integer
     end;
 
-Type deck = array[0..51] of carte;
-Type joueurs=array of joueur;
+Type deck = array[0..51] of carte; // Liste de toutes les cartes du jeu, triées
+Type joueurs=array of joueur; // Liste de tous les joueurs du jeu
 
 var d:deck;
     liste:joueurs;
     conf:config;
 
 
+// Vérifie si une carte se trouve dans une liste de cartes
 function inarray(liste:array of carte;card:carte):boolean;
 var i:integer;
 begin
@@ -40,6 +41,7 @@ begin
     Exit(False);
 end;
 
+// Initialise le jeu, en créant le paquet de cartes
 function init:deck;
 var i,j:integer;
     couleur:string;
@@ -106,6 +108,7 @@ begin
     normvideo;
 end;
 
+// Distribue un certain nombre de cartes aux joueurs, selon le deck de base
 procedure distribuer(var liste:joueurs;n:integer);
 var i,k,p:integer;
     utilises:deck;
@@ -123,6 +126,7 @@ begin
         end;
 end;
 
+// Fonction globale de la partie, qui va appeller toutes les autres
 procedure partie(liste:joueurs);
 var c:carte;
 begin
