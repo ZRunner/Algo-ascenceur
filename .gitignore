@@ -1,1 +1,5 @@
-
+*
+!*.pas
+!*.md
+!.gitignore
+!LICENSE
