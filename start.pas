@@ -70,13 +70,16 @@ end;
 
 
 function creerjoueur:joueur;
-var age:integer;pseudo:string;
+var age:integer;pseudo:string;ok:boolean;
 begin
     write('Indiquez votre pseudo',#10,'> ');readln(pseudo);
+    {$I-}   {compiler directive, removes abort on IO error}
     write('Indiquez votre âge',#10,'> ');readln(age);
-    while (conf.min_age>age) or (age>conf.max_age) do begin
+    while (conf.min_age>age) or (age>conf.max_age) or (IOResult <> 0) do begin
+        ok := IOResult=0;
         write('Indiquez votre âge',#10,'> ');readln(age);
     end;
+    {$I+}   {restores default IO checking} 
     creerjoueur.age := age;
     creerjoueur.pseudo := pseudo;
 end;
