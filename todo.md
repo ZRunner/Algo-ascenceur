@@ -22,5 +22,11 @@ Dans la procédure principale, nous aurons besoin d'appeller la fonction de gest
 ### • Procédure finale
 Prend en arguments la liste des joueurs pour déterminer le gagnant en fonction des points totaux, puis affiche le gagnant et éventuellement quelques stats bonus (nombre de plis par joueur, moyenne des paris etc).
 
+### • Affichage des cartes dans le terminal
+Si jamais les joueurs veulent jouer dans le terminal, il faut trouver un moyen simple et intuitif d'afficher les cartes d'un joueur (qui peuvent être entre 1 et 26 selon les parties et le nombre de joueurs).
+
 ### • Tests sur une interface graphique
 Avant de se lancer à la "traduction" du jeu en dessins, il va falloir exécuter quelques tests sur le package `glib2D` : affichage d'éléments graphiques, affichage d'images externes, affichage de texte, détection de clics, champ de texte...
+
+### • Faire le rapport
+Présentation du sujet, "mode d'emploi" du programme, explications du code, et résumé du projet selon chacun de nous. Le tout en LaTeX bien évidemment.
