@@ -1,6 +1,6 @@
 program Projet;
 
-uses fpjson, jsonparser, Crt, sysutils;
+uses fpjson, jsonparser, Intro, Crt, sysutils;
 
 
 Type carte = Record // L'une des 52 cartes du jeu
@@ -162,4 +162,5 @@ begin
     setlength(liste,conf.players);
     creerjoueurs(liste);
     partie(liste);
+    Demande();
 end.
