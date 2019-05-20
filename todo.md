@@ -28,5 +28,5 @@ Si jamais les joueurs veulent jouer dans le terminal, il faut trouver un moyen s
 ### • Tests sur une interface graphique
 Avant de se lancer à la "traduction" du jeu en dessins, il va falloir exécuter quelques tests sur le package `glib2D` : affichage d'éléments graphiques, affichage d'images externes, affichage de texte, détection de clics, champ de texte...
 
-### • Faire le rapport
+### • Faire le rapport (En cours(A mince on est pas à l'école ...))
 Présentation du sujet, "mode d'emploi" du programme, explications du code, et résumé du projet selon chacun de nous. Le tout en LaTeX bien évidemment.
