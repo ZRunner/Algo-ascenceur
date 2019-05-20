@@ -1,0 +1,21 @@
+Ascenceur
+
+But du jeu: Avoir le score le plus élevé à la fin de la partie.
+
+
+Déroulement de la partie:
+
+	La partie se déroule en 2 phases: la phase ascendante et la phase descendante.
+Phase ascendante : les joueurs reçoivent chacun 1 seule carte à la première manche, 2 cartes à la deuxième, 3 à la troisième... et ainsi de suite jusqu'au nombre maximal de cartes distribuables par joueur. 
+Phase descendante : les joueurs reçoivent chacun le nombre maximal à la première manche, puis une carte de moins à la suivante, et ainsi de suite.
+
+	A chaque manche, chaque joueur parie sur le nombre de plis qu'il compte remporter. Notez que la somme des paris doit obligatoirement être égale au nombre de cartes données par joueur plus un.
+
+	Le décompte des points se fait par manche. Soit x le nombre de plis parié et soit y le nombre de plis réalisés. Si le joueur a gagné son pari, il remporte 10+2x points. Sinon, son score de manche est 10-2(x-y).
+
+Déroulement d'un tour:
+Le premier joueur expose une carte de son jeu, puis les autres joueurs doivent à leur tour exposer une carte de la même couleur, l'un après l'autre. Ceux qui n'ont pas de carte de la même couleur peuvent en exposer une autre de leur jeu (n'importe laquelle). Celui qui a joué la plus forte carte remporte le pli, et joue le premier au tour suivant.
+
+Particularités:
+- jeu avec atout (la première carte du tas non distribué doit être retourné et est la couleur atout de la manche)
+
