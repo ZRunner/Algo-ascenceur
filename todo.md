@@ -4,7 +4,7 @@
 ### • ~~Gestion des couleurs pour la version terminale~~
 Lorsque le jeu est joué dans un terminale (donc sans graphisme) chaque joueur doit avoir une couleur assignée. Il faut pouvoir prévoire une couleur différente par joueur.
 
-### • Configuration lisible dans un fichier .json
+### • ~~Configuration lisible dans un fichier .json~~
 Il faut créer un fichier au format json pour y insérer les configurations des parties (celles qui ne sont pas demandées aux joueurs), puis intégrer la lecture de ce fichier dans la fonction `loadconfig`, à la place de la chaine de caractères actuelle.
 
 ### • Introduction au jeu
