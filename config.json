@@ -1,0 +1,8 @@
+{
+    "max_players":5,
+    "win_default":10,
+    "win":2,
+    "loose":-2,
+    "min_age":5,
+    "max_age":100
+}
