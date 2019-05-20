@@ -1,6 +1,6 @@
 program Projet;
 
-uses fpjson, jsonparser, Crt;
+uses fpjson, jsonparser, Crt, sysutils;
 
 
 Type carte = Record // L'une des 52 cartes du jeu
@@ -62,12 +62,31 @@ begin
     writeln(a)
 end;
 
+// Lecture d'un fichier (celui de config)
+function loadfile(nom:string):unicodestring;
+var fic:text;
+    ligne:unicodestring;
+begin
+    ligne := '';
+    loadfile := '';
+    { $i- }
+    assign(fic,nom);
+    reset(fic);
+    if IOResult<>0 then Exit('');
+    repeat
+        readln(fic,ligne);
+        ligne := Trim(ligne);
+        loadfile := loadfile+ligne;
+    until eof(fic);
+    close(fic);
+end;
+
 // Chargement de la configuration du jeu
 function loadconfig:config;
 var jData:TJSONData;
     jObject : TJSONObject;
 begin
-    jData := GetJSON('{"max_players":5,"win_default":10,"win":2,"loose":-2,"min_age":5,"max_age":100}');
+    jData := GetJSON(loadfile('config.json'));
     jObject := TJSONObject(jData);
     loadconfig.players := jObject.Get('max_players');
     loadconfig.win_defaut := jObject.Get('win_default');
@@ -91,7 +110,7 @@ begin
         ok := IOResult=0;
         write('Indiquez votre âge',#10,'> ');readln(age);
     end;
-    {$I+}   {restores default IO checking} 
+    {$I+}   {restores default IO checking}
     creerjoueur.age := age;
     creerjoueur.pseudo := pseudo;
     writeln;
@@ -100,8 +119,8 @@ end;
 // Création de la liste de tous les joueurs
 procedure creerjoueurs(var liste:joueurs);
 var i:integer;
-    cls:array[0..4] of byte=(red,yellow,blue,green,,LightMagenta,Brown,White);
-    clsn:array[0..4] of string=('Rouge','Jaune','Bleu','Vert','Violet','Marron','Blanc');
+    cls:array[0..6] of byte=(red,yellow,blue,green,Magenta,Brown,LightGray);
+    clsn:array[0..6] of string=('Rouge','Jaune','Bleu','Vert','Violet','Marron','Blanc');
 begin
     for i:=0 to high(liste) do
         liste[i] := creerjoueur(cls[i],clsn[i]);
