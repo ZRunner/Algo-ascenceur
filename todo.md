@@ -7,7 +7,7 @@ Lorsque le jeu est joué dans un terminale (donc sans graphisme) chaque joueur d
 ### • ~~Configuration lisible dans un fichier .json~~
 Il faut créer un fichier au format json pour y insérer les configurations des parties (celles qui ne sont pas demandées aux joueurs), puis intégrer la lecture de ce fichier dans la fonction `loadconfig`, à la place de la chaine de caractères actuelle.
 
-### • Introduction au jeu
+### • ~~Introduction au jeu~~
 Les utilisateurs doivent avoir une courte présentation du jeu au début de la partie, puis être en mesure de donner le nombre de joueurs (entre 1 et le nombre max du fichier de config).
 
 ### • Fonction pour demander la carte à jouer à un joueur
