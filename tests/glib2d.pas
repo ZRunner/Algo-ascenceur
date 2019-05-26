@@ -711,7 +711,7 @@ begin
 	glClear(GL_COLOR_BUFFER_BIT);
 end;
 
-procedure _Common;
+procedure _gBeginCommon;
 begin
 	If not(start) Then
 		_gStart;
