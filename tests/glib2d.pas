@@ -22,8 +22,8 @@ Type
 Const
     (* Screen constants *)
     TITLE = 'Free Pascal - SDL Window';
-    G_SCR_W         = 1050;
-    G_SCR_H         = 800;
+    G_SCR_W         = 900;
+    G_SCR_H         = 900;
     G_VOID          = 0;
 
     (* Colors *)
