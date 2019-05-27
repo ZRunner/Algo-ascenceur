@@ -13,6 +13,7 @@ Type joueur=Record // L'un des joueurs
     pseudo:string;
     age:integer;
     couleur:byte;
+    pari:integer;
     end;
 
 Type config = Record // configuration de la partie
@@ -27,6 +28,9 @@ Type config = Record // configuration de la partie
 Type deck = array[0..51] of carte; // Liste de toutes les cartes du jeu, triées
 Type joueurs=array of joueur; // Liste de tous les joueurs du jeu
 
+var d:deck;
+    liste:joueurs;
+    conf:config;
 
 //initialise le nombre de joueurs
 Function InitJoueur():integer; 
@@ -73,7 +77,7 @@ begin
 	For i:=0 to high(liste) do
 	begin
 		k:=-1;
-		While (k<0 or k>m) do
+		While (k<0) or (k>m) do
 		begin
 			writeln('Combien de plis pensez-vous réaliser ?');
 			readln(k);
