@@ -119,7 +119,7 @@ If (conf.players=2) or (conf.players=4) then
  nbrManche:=nbrManche-1;
 end;
 
-Procedure Pli(var liste:joueurs); // Procédure permettant d'afficher l'ordre des joueurs pour la manche suivante. 
+Procedure OrdreJoueur(var liste:joueurs); // Procédure permettant d'afficher l'ordre des joueurs pour le pli suivant. 
 var i,j,x:integer;
 T:joueurs;
 begin
@@ -149,6 +149,42 @@ For i:=1 to high(liste) do
 	If NomGagnant(liste):= liste[i] then
 	Exit(i);
 end;
+
+//Fonction pour vérifier si la couleur choisi par le joueur sur le terminal existe 
+Function VerifCouleurExiste(colo:string):boolean;
+begin
+	If (colo='trefle') Then VerifCouleurExiste:=true
+	Else If (colo='pique') Then VerifCouleurExiste:=true
+	Else If (colo='coeur') Then VerifCouleurExiste:=true
+	Else If (colo='carreau') Then VerifCouleurExiste:=true
+	Else VerifCouleurExiste:=false;
+end;
+
+//function vérifiant si la valeur de la carte existe
+Function VerifValeurExiste(val:integer):boolean;
+begin
+	If (val>0) and (val<14) then VerifValeurExiste:=true
+	Else VerifValeurExiste:=false;
+end;
+
+//Fonction qui demande et renvoit le choix d'une carte par un joueur dans son paquet
+Function ChoixCarte:carte;
+begin
+	Repeat 
+		writeln('Couleur de la carte que vous voulez jouer :');
+		readln(ChoixCarte.couleur);
+	Until VerifCouleurExiste(ChoixCarte.couleur); //vérifier couleur choisie existe
+	Repeat
+		writeln('Valeur de cette dernière');
+		readln(ChoixCarte.valeur);
+	Until VerifValeurExiste(ChoixCarte.valeur); //vérifier que la carte est bien entre 1 et roi (13)
+end;
+
+//Fonction vérifiant carte est dans le paquet ...
+
+//Fonction qui vérifie que la carte peut être jouer par rapport au jeu en cours
+
+//Function qui déduit la carte gagnante du pli avec toute les condition et renvoit le pseudo du gagnat du pli
 
 //pour un tour
 Procedure Pli(var liste:joueurs);
