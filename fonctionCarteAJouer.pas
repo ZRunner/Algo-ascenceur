@@ -111,6 +111,45 @@ begin
 	end;
 end; // deux autres procedures du même principe pour gagnant nouveau pli et nouvelle manche 
 
+Procedure NombreManche(var conf:config); // Calcule le nombre de manches dans une partie en fonction du nombre de joueurs.
+begin
+conf.players:=InitJoueur();
+nbrManche:=round(52/i);
+If (conf.players=2) or (conf.players=4) then 
+ nbrManche:=nbrManche-1;
+end;
+
+Procedure Pli(var liste:joueurs); // Procédure permettant d'afficher l'ordre des joueurs pour la manche suivante. 
+var i,j,x:integer;
+T:joueurs;
+begin
+	setlength(T,high(liste)+1);
+	T[0]:=liste[0];
+	For i:=1 to high(liste) do
+	begin
+			T[0]:=GagnantPliPrecedent(liste);
+			x:=i;
+		end;
+	end;
+	j:=x+1;
+	For i:=1 to high(T) do
+	begin
+		T[i]:=liste[j];
+		j:=j+1;
+		if j=high(liste) then j:=0
+	end;
+end;
+
+//Faire une procédure permettant de réaliser tout les plis de la manche.
+
+Function RecherchePseudoGagnant(liste:joueurs):integer; //Function retrouvant dans la liste le pseudo du gagnant.
+var i: integer;
+begin
+For i:=1 to high(liste) do 
+	If NomGagnant(liste):= liste[i] then
+	Exit(i);
+end;
+
 //pour un tour
 Procedure Pli(var liste:joueurs);
 var i:integer;
