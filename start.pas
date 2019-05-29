@@ -1,190 +1,164 @@
-program gui;
+program Projet;
 
-{$mode objfpc}
-
-uses gLib2D, SDL_TTF, Crt, sysutils;
-
-
-Type joueur=Record // L'un des joueurs
-    pseudo:string;
-    couleur:byte;
-end;
-Type joueurs=array of joueur;
-
-type joueur_graph=Record // uniquement les infos utiles
-    pseudo:string;
-    couleur:gColor;
-    x,y:integer;
-    pseudo_txt:gImage;
-end;
-Type joueurs_graph=array of joueur_graph;
+uses fpjson, jsonparser, Intro, Crt, sysutils;
 
 Type carte = Record // L'une des 52 cartes du jeu
     couleur:string;
     valeur:integer;
-end;
-
-
-procedure afficher_carte(x,y:real;cart:carte;font_cartes:PTTF_Font;echelle:real=1);
-var txt: gImage;
-    w,h:real;
-    couleur:string;
-begin
-    w := 50*echelle;
-    h := 80*echelle;
-    gFillRect(x-w/2,y-h/2,w,h,gLib2D.WHITE);
-    gDrawRect(x-w/2,y-h/2,w,h,gLib2D.BLACK);
-    CASE cart.couleur OF
-        'carreau': couleur := '[';
-        'pique': couleur := '}';
-        'trèfle': couleur := ']';
-        'coeur': couleur := '{';
-    else
-        couleur := 'Z';
     end;
-    try
-    //writeln(font_cartes=Nil);
-    txt := gTextLoad(couleur+inttostr(cart.valeur),font_cartes);
-    except
-        On E :Exception do begin
-            writeln('ERROR ligne 39: ',E.message);
-            writeln('  ',TTF_GetError());
-            Halt;
-        end;
-    end;
-    gBeginRects(txt);
-        gSetCoordMode(G_CENTER);
-        if (couleur='[') or (couleur='{') then
-            gSetColor(gLib2D.RED)
-        else
-            gSetColor(gLib2D.BLACK);
-        gSetCoord(x,y-10*echelle);
-        gAdd();
-    gEnd();
-end;
 
-procedure afficher_cartes(liste:array of carte;font_cartes:PTTF_Font);
+Type joueur=Record // L'un des joueurs
+    cartes:array of carte;
+    pseudo:string;
+    age:integer;
+    couleur:byte;
+    end;
+
+Type config = Record // configuration de la partie
+    players:integer;
+    win_defaut:integer;
+    win:integer;
+    loose:integer;
+    min_age:integer;
+    max_age:integer
+    end;
+
+Type deck = array[0..51] of carte; // Liste de toutes les cartes du jeu, triées
+Type joueurs=array of joueur; // Liste de tous les joueurs du jeu
+
+var d:deck;
+    liste:joueurs;
+    conf:config;
+
+// Vérifie si une carte se trouve dans une liste de cartes
+function inarray(liste:array of carte;card:carte):boolean;
 var i:integer;
-    x,y,echelle:real;
 begin
-    if length(liste)>40 then echelle:=0.4
-    else if length(liste)>20 then echelle:=0.5
-    else if length(liste)>10 then echelle:=0.9
-    else echelle:=1;
-    x := (G_SCR_H div 2)-length(liste)*(52*echelle)/2;
-    y := G_SCR_H*0.8;
-    for i:=0 to high(liste) do begin
-        afficher_carte(x,y,liste[i],font_cartes,echelle);
-        x += 51*echelle;
-        end;
+    for i:=0 to high(liste) do
+        if (liste[i].couleur = card.couleur) and (liste[i].valeur = card.valeur) then Exit(True);
+    Exit(False);
 end;
 
-
-procedure afficher_joueurs(players_graph:joueurs_graph);
-var i,players_nbr:integer;
-Begin
-    players_nbr := length(players_graph);
-    for i:=0 to players_nbr-1 do begin (* Ajout des points des joueurs *)
-        gBeginRects(players_graph[i].pseudo_txt); (* Ajout des pseudos *)
-            gSetCoordMode(G_CENTER);
-            gSetCoord(players_graph[i].x,players_graph[i].y+G_SCR_W*0.04);
-            gSetColor(gLib2D.BLACK);
-            gAdd();
-        gEnd();
-    gFillCircle(players_graph[i].x,players_graph[i].y, G_SCR_W*0.025, players_graph[i].couleur);
-end;
-end;
-
-
-procedure launch(players_list:joueurs);
-var font_noms, font_cartes : PTTF_Font;
-    image : gImage;
-    alpha, x, y, w, h : integer;
-    i, players_nbr : integer;
-    theta : real;
-    players_graph : joueurs_graph;
-    c:carte;
+// Initialise le jeu, en créant le paquet de cartes
+function init:deck;
+var i,j:integer;
+    couleur:string;
+    cs:array[0..3] of string=('carreau','pique','trèfle','coeur');
 begin
-    gClear(gLib2D.BLACK);
+    j := 0;
+    for couleur in cs do
+        for i:=2 to 14 do begin
+            init[j].couleur := couleur;
+            init[j].valeur := i;
+            j := j+1;
+            end;
+end;
 
-    image := gTexLoad('tex.jpg'); (* Chargement de la texture *)
-    alpha := 255; (* Alpha = 255 => opaque *)
-    x := G_SCR_W div 2; (* Milieu de l'écran *)
-    y := G_SCR_H div 2; (* Milieu de l'écran *)
-    w := G_SCR_W; (* Largeur de l'écran *)
-    h := G_SCR_H; (* Hauteur de l'écran *)
-    font_noms :=  TTF_OpenFont('font_names.ttf', round(G_SCR_W*0.02));
-    font_cartes := TTF_OpenFont('font_cards.ttf', round(G_SCR_W*0.02));
+// Cette fonction pourra facilement être changée lorsqu'on entamera la partie graphique
+procedure display_text(a:string);
+begin
+    writeln(a)
+end;
 
-    players_nbr := length(players_list);
-    SetLength(players_graph,players_nbr);
-    for i:=0 to players_nbr-1 do begin (* Initialisation des positions et des couleurs *)
-        theta := 2*pi/players_nbr*i;
-        players_graph[i].x := round(cos(theta)*G_SCR_W*0.44) + x;
-        players_graph[i].y := round(sin(theta)*G_SCR_W*0.44) + y;
-        players_graph[i].pseudo_txt := gTextLoad(players_list[i].pseudo,font_noms);
-        case players_list[i].couleur OF (* Transformation byte => gColor *)
-            red: players_graph[i].couleur := gLib2D.RED;
-            yellow: players_graph[i].couleur := gLib2D.YELLOW;
-            blue: players_graph[i].couleur := gLib2D.AZURE;
-            green: players_graph[i].couleur := gLib2D.GREEN;
-            magenta: players_graph[i].couleur := gLib2D.MAGENTA;
-            brown: players_graph[i].couleur := gLib2D.ORANGE;
-        else players_graph[i].couleur := gLib2D.DARKGRAY;
-        end;
+
+// Lecture d'un fichier (celui de config)
+function loadfile(nom:string):unicodestring;
+var fic:text;
+    ligne:unicodestring;
+begin
+    ligne := '';
+    loadfile := '';
+    { $i- }
+    assign(fic,nom);
+    reset(fic);
+    if IOResult<>0 then Exit('');
+    repeat
+        readln(fic,ligne);
+        ligne := Trim(ligne);
+        loadfile := loadfile+ligne;
+    until eof(fic); 
+    close(fic);
+end;
+
+// Chargement de la configuration du jeu
+function loadconfig:config;
+var jData:TJSONData;
+    jObject : TJSONObject;
+begin
+    jData := GetJSON(loadfile('config.json'));
+    jObject := TJSONObject(jData);
+    loadconfig.players := jObject.Get('max_players');
+    loadconfig.win_defaut := jObject.Get('win_default');
+    loadconfig.win := jObject.Get('win');
+    loadconfig.loose := jObject.Get('loose');
+    loadconfig.min_age := jObject.Get('min_age');
+    loadconfig.max_age := jObject.Get('max_age');
+end;
+
+// Création d'un joueur, avec son pseudo, sa couleur et son age
+function creerjoueur(couleur:byte;colorname:string):joueur;
+var age:integer;pseudo:string;ok:boolean; 
+begin
+    textcolor(couleur);
+    creerjoueur.couleur := couleur;
+    write('Joueur ',colorname,', indiquez votre pseudo',#10,'> ');readln(pseudo);
+    {$I-}   {compiler directive, removes abort on IO error}
+    write('Indiquez votre âge',#10,'> ');readln(age);
+    while (conf.min_age>age) or (age>conf.max_age) or (IOResult <> 0) do begin
+        ok := IOResult=0;
+        write('Indiquez votre âge',#10,'> ');readln(age);
     end;
+    {$I+}   {restores default IO checking}
+    creerjoueur.age := age;
+    creerjoueur.pseudo := pseudo;
+    writeln;
+end;
 
-    c.couleur := 'carreau';
-    c.valeur := 3;
+// Création de la liste de tous les joueurs
+procedure creerjoueurs(var liste:joueurs);
+var i:integer;
+    cls:array[0..6] of byte=(red,yellow,blue,green,Magenta,Brown,LightGray);
+    clsn:array[0..6] of string=('Rouge','Jaune','Bleu','Vert','Violet','Marron','Blanc');
+begin
+    for i:=0 to high(liste) do
+        liste[i] := creerjoueur(cls[i],clsn[i]);
+    normvideo;
+end;
 
-    while true do begin (* Boucle principale *)
 
-        gClear(gLib2D.LITEGRAY);
-            gBeginRects(image); (* Ajout de l'image de fond *)
-                gSetCoordMode(G_CENTER);
-                gSetAlpha(alpha);
-                gSetScaleWH(w, h);
-                gSetCoord(x, y);
-                gAdd();
-            gEnd();
-
-        afficher_joueurs(players_graph);
-
-        afficher_carte(300,500,c,font_cartes);
-
-        try
-        gFlip();
-        except
-            On E :Exception do begin
-                writeln('4. ',E.message);
-                Halt;
+// Distribue un certain nombre de cartes aux joueurs, selon le deck de base
+procedure distribuer(var liste:joueurs;n:integer);
+var i,k,p:integer;
+    utilises:deck;
+begin
+    k := 0;
+    for p:=0 to high(liste) do begin
+        setlength(liste[p].cartes,n);
+        for i:=0 to n-1 do begin
+            liste[p].cartes[i] := d[random(52)];
+            while inarray(utilises,liste[p].cartes[i]) do
+                liste[p].cartes[i] := d[random(52)];
+            utilises[k] := liste[p].cartes[i];
+            k := k+1;
             end;
         end;
+end;
 
-        while (sdl_update = 1) do
-            if (sdl_do_quit) then (* Clic sur la croix pour fermer *)
-                exit;
-    end;
+// Fonction globale de la partie, qui va appeller toutes les autres
+procedure partie(liste:joueurs);
+var c:carte;
+begin
+    distribuer(liste,5);
+    c := liste[0].cartes[0];
 end;
 
 
-
-
-
-var joueurs_list:joueurs;
 begin
-    SetLength(joueurs_list,6);
-    joueurs_list[0].pseudo := 'Z_runner';
-    joueurs_list[0].couleur := red;
-    joueurs_list[1].pseudo := 'MelyMelo8';
-    joueurs_list[1].couleur := YELLOW;
-    joueurs_list[2].pseudo := 'Moustique';
-    joueurs_list[2].couleur := blue;
-    joueurs_list[3].pseudo := 'Awhikax';
-    joueurs_list[3].couleur := green;
-    joueurs_list[4].pseudo := 'OxXo';
-    joueurs_list[4].couleur := magenta;
-    joueurs_list[5].pseudo := 'Leo';
-    joueurs_list[5].couleur := brown;
-    launch(joueurs_list);
+    randomize;
+    d := init;
+    conf := loadconfig;
+    setlength(liste,conf.players);
+    creerjoueurs(liste);
+    partie(liste);
+    Demande();
 end.
