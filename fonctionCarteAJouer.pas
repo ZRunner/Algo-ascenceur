@@ -126,6 +126,41 @@ begin
 	end;
 end; 
 
+Function RandomDeck:deck
+var p:deck
+Begin
+ k := 0;
+        for i:=0 to 51 do begin
+            p[i] := d[random(52)];         
+            while inarray(utilises,p[i]) do
+                p[i] := d[random(52)];
+            utilises[k] := p[i];
+            k := k+1;
+		end;
+end;
+
+Function Atout (liste:joueurs,n:integer):carte; // n= nbr de cartes par joueur et p=nombre de players
+var d:deck;
+p:integer;
+j,i:integer;
+T: array of carte;
+begin
+d:=Randomdeck;
+p:=InitJoueur();
+Distribuer(liste,p);
+i:=n*p-1;
+Setlength(T,n*p);
+For j:=0 to n*p-1 do
+Begin
+	While (i-n*p-1<=n*p-1) do
+		Begin
+		T[j]:=d[i];
+		i:=i+1;
+		end;
+end;
+Atout:=T[0];
+end;
+
 Procedure NombreManche(var conf:config); // Calcule le nombre de manches dans une partie en fonction du nombre de joueurs.
 begin
 conf.players:=InitJoueur();
