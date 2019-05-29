@@ -25,7 +25,7 @@ Type carte = Record // L'une des 52 cartes du jeu
 end;
 
 
-procedure afficher_carte(x,y:real;cart:carte;font_cartes:PTTF_Font;echelle:integer=1);
+procedure afficher_carte(x,y:real;cart:carte;font_cartes:PTTF_Font;echelle:real=1);
 var txt: gImage;
     w,h:real;
     couleur:string;
@@ -54,10 +54,29 @@ begin
     end;
     gBeginRects(txt);
         gSetCoordMode(G_CENTER);
-        gSetColor(gLib2D.RED);
+        if (couleur='[') or (couleur='{') then
+            gSetColor(gLib2D.RED)
+        else
+            gSetColor(gLib2D.BLACK);
         gSetCoord(x,y-10*echelle);
         gAdd();
     gEnd();
+end;
+
+procedure afficher_cartes(liste:array of carte;font_cartes:PTTF_Font);
+var i:integer;
+    x,y,echelle:real;
+begin
+    if length(liste)>40 then echelle:=0.4
+    else if length(liste)>20 then echelle:=0.5
+    else if length(liste)>10 then echelle:=0.9
+    else echelle:=1;
+    x := (G_SCR_H div 2)-length(liste)*(52*echelle)/2;
+    y := G_SCR_H*0.8;
+    for i:=0 to high(liste) do begin
+        afficher_carte(x,y,liste[i],font_cartes,echelle);
+        x += 51*echelle;
+        end;
 end;
 
 
@@ -150,6 +169,8 @@ end;
 
 
 
+
+
 var joueurs_list:joueurs;
 begin
     SetLength(joueurs_list,6);
@@ -163,7 +184,7 @@ begin
     joueurs_list[3].couleur := green;
     joueurs_list[4].pseudo := 'OxXo';
     joueurs_list[4].couleur := magenta;
-    joueurs_list[5].pseudo := '[] {}';
+    joueurs_list[5].pseudo := 'Leo';
     joueurs_list[5].couleur := brown;
     launch(joueurs_list);
 end.
