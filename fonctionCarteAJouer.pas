@@ -50,6 +50,21 @@ begin
     Exit(False);
 end;
 
+// Initialise le jeu, en créant le paquet de cartes
+function init:deck;
+var i,j:integer;
+    couleur:string;
+    cs:array[0..3] of string=('carreau','pique','trefle','coeur');
+begin
+    j := 0;
+    for couleur in cs do
+        for i:=2 to 14 do begin
+            init[j].couleur := couleur;
+            init[j].valeur := i;
+            j := j+1;
+            end;
+end;
+
 //distribue les cartes par joueurs
 procedure distribuer(var liste:joueurs;n:integer);
 var i,k,p:integer;
@@ -109,7 +124,7 @@ begin
 		j:=j+1;
 		if j=high(liste) then j:=0
 	end;
-end; // deux autres procedures du même principe pour gagnant nouveau pli et nouvelle manche 
+end; 
 
 Procedure NombreManche(var conf:config); // Calcule le nombre de manches dans une partie en fonction du nombre de joueurs.
 begin
@@ -119,36 +134,7 @@ If (conf.players=2) or (conf.players=4) then
  nbrManche:=nbrManche-1;
 end;
 
-Procedure OrdreJoueur(var liste:joueurs); // Procédure permettant d'afficher l'ordre des joueurs pour le pli suivant. 
-var i,j,x:integer;
-T:joueurs;
-begin
-	setlength(T,high(liste)+1);
-	T[0]:=liste[0];
-	For i:=1 to high(liste) do
-	begin
-			T[0]:=GagnantPliPrecedent(liste);
-			x:=i;
-		end;
-	end;
-	j:=x+1;
-	For i:=1 to high(T) do
-	begin
-		T[i]:=liste[j];
-		j:=j+1;
-		if j=high(liste) then j:=0
-	end;
-end;
-
 //Faire une procédure permettant de réaliser tout les plis de la manche.
-
-Function RecherchePseudoGagnant(liste:joueurs):integer; //Function retrouvant dans la liste le pseudo du gagnant.
-var i: integer;
-begin
-For i:=1 to high(liste) do 
-	If NomGagnant(liste):= liste[i] then
-	Exit(i);
-end;
 
 //Fonction pour vérifier si la couleur choisi par le joueur sur le terminal existe 
 Function VerifCouleurExiste(colo:string):boolean;
@@ -193,17 +179,63 @@ begin
 	Until VerifieCarteAjoueur(paquet,ChoixCarte); //vérifie que la carte peut être jouer par le joueur
 end;
 
-//Fonction qui vérifie que la carte peut être jouer par rapport au jeu en cours
-
-//Function qui déduit la carte gagnante du pli avec toute les condition et renvoit le pseudo du gagnat du pli
-
-//pour un tour
-Procedure Pli(var liste:joueurs);
+//vérifie si la carte peut être jouer en fonction du jeu et de la première carte
+Function VerifDroitDePoser(paquet:joueur;choix,prems:carte):boolean;
 var i:integer;
 begin
-	For i:=0 to high(liste) do
+	If (choix.couleur=prems.couleur) Then VerifDroitDePoser:=true
+	Else
 	begin
-		
+		VerifDroitDePoser:=true; //initialisation
+		For i:=0 to high(paquet.cartes) do
+		begin
+			If (paquet.cartes[i].couleur=prems.couleur) Then Exit(false);
+		end;
+	end;
+end;
+
+//pour un tour, renvoit un entier qui est le numéro du gagnant dans la liste actuelle
+Function Pli(var liste:joueurs; atout:string):integer;
+var i:integer; T:array of carte; choix:carte; best:integer;
+begin
+	T[0]:=ChoixCarte(liste[0].cartes);
+	best:=0;
+	For i:=1 to high(liste) do
+	begin
+		Repeat 
+			choix:=ChoixCarte(liste[i].cartes); //choix est dans le paquet du joueur	
+		Until VerifDroitDePoser(liste[i],choix,T[0]); 
+		T[i]:=choix;
+		If (T[i].couleur=T[i-1].couleur) and (T[i].valeur>T[i-1].valeur) Then best:=i; 
+		//à rajouter comparaison avec l'atout
+	end;
+	Exit(best);
+end;
+
+//Function retrouvant dans la liste le pseudo du gagnant.
+Function RecherchePseudoGagnant(liste:joueurs,atout:string):joueur; 
+var i: integer;
+begin
+For i:=1 to high(liste) do 
+	If Pli(liste,atout):= i then
+	Exit(liste[i]);
+end;
+
+// Procédure permettant d'afficher l'ordre des joueurs pour le pli suivant. 
+Procedure OrdreJoueur(var liste:joueurs;atout:string); 
+var i,j,x:integer;
+T:joueurs;
+begin
+	setlength(T,high(liste)+1);
+	T[0]:=RecherchePseudoGagnant(liste,atout);
+	For i:=1 to high(liste) do
+		If T[0]=liste[i] Then x:=i;
+	j:=x+1;
+	For i:=1 to high(T) do
+	begin
+		T[i]:=liste[j];
+		j:=j+1;
+		if j=high(liste) then j:=0
 	end;
 end;
 
