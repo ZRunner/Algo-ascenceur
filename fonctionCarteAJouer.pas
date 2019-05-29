@@ -167,20 +167,31 @@ begin
 	Else VerifValeurExiste:=false;
 end;
 
-//Fonction qui demande et renvoit le choix d'une carte par un joueur dans son paquet
-Function ChoixCarte:carte;
+//Fonction vérifiant carte est dans le paquet du joueur choisi
+Function VerifieCarteAjoueur(paquet:joueur;Choix:carte):boolean;
+var i:integer;
 begin
-	Repeat 
-		writeln('Couleur de la carte que vous voulez jouer :');
-		readln(ChoixCarte.couleur);
-	Until VerifCouleurExiste(ChoixCarte.couleur); //vérifier couleur choisie existe
-	Repeat
-		writeln('Valeur de cette dernière');
-		readln(ChoixCarte.valeur);
-	Until VerifValeurExiste(ChoixCarte.valeur); //vérifier que la carte est bien entre 1 et roi (13)
+	VerifieCarteAjoueur:=false;
+	For i:=0 to high(paquet.cartes) do
+	begin
+		if choix=paquet.cartes[i] Then VerifieCarteAjoueur:=true;
+	end;
 end;
 
-//Fonction vérifiant carte est dans le paquet ...
+//Fonction qui demande et renvoit le choix d'une carte par un joueur dans son paquet
+Function ChoixCarte(paquet:joueur):carte;
+begin
+	Repeat
+		Repeat 
+			writeln('Couleur de la carte que vous voulez jouer :');
+			readln(ChoixCarte.couleur);
+		Until VerifCouleurExiste(ChoixCarte.couleur); //vérifier couleur choisie existe
+		Repeat
+			writeln('Valeur de cette dernière');
+			readln(ChoixCarte.valeur);
+		Until VerifValeurExiste(ChoixCarte.valeur); //vérifier que la carte est bien entre 1 et roi (13)
+	Until VerifieCarteAjoueur(paquet,ChoixCarte); //vérifie que la carte peut être jouer par le joueur
+end;
 
 //Fonction qui vérifie que la carte peut être jouer par rapport au jeu en cours
 
