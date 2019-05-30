@@ -2,8 +2,10 @@ program gui;
 
 {$mode objfpc}
 
-uses gLib2D, SDL_TTF, Crt, sysutils;
+uses gLib2D, SDL_TTF, Crt, sysutils, math;
 
+CONST carte_w:integer=26;
+    carte_h:integer=45;
 
 Type joueur=Record // L'un des joueurs
     pseudo:string;
@@ -24,16 +26,17 @@ Type carte = Record // L'une des 52 cartes du jeu
     valeur:integer;
 end;
 
+type carte_graph=Record
+    couleur:gColor;
+    texte:gImage;
+end;
 
-procedure afficher_carte(x,y:real;cart:carte;font_cartes:PTTF_Font;echelle:real=1);
-var txt: gImage;
-    w,h:real;
-    couleur:string;
+
+function convert(cart:carte;font_cartes:PTTF_Font=nil):carte_graph;
+var couleur:string;
 begin
-    w := 50*echelle;
-    h := 80*echelle;
-    gFillRect(x-w/2,y-h/2,w,h,gLib2D.WHITE);
-    gDrawRect(x-w/2,y-h/2,w,h,gLib2D.BLACK);
+    if font_cartes=nil then
+        font_cartes := TTF_OpenFont('font_cards.ttf', round(G_SCR_W*0.015));
     CASE cart.couleur OF
         'carreau': couleur := '[';
         'pique': couleur := '}';
@@ -42,41 +45,51 @@ begin
     else
         couleur := 'Z';
     end;
-    try
-    //writeln(font_cartes=Nil);
-    txt := gTextLoad(couleur+inttostr(cart.valeur),font_cartes);
-    except
-        On E :Exception do begin
-            writeln('ERROR ligne 39: ',E.message);
-            writeln('  ',TTF_GetError());
-            Halt;
-        end;
-    end;
-    gBeginRects(txt);
+    convert.texte := gTextLoad(couleur+inttostr(cart.valeur),font_cartes);
+    if (couleur='[') or (couleur='{') then
+        convert.couleur := gLib2D.RED
+    else
+        convert.couleur := gLib2D.BLACK;
+end;
+
+procedure afficher_carte(x,y:real;cart:carte_graph;font_cartes:PTTF_Font;echelle:real=1);
+var w,h:real;
+begin
+    w := carte_w*echelle;
+    h := carte_h*echelle;
+    gFillRect(x-w/2,y-h/2,w,h,gLib2D.WHITE);
+    gDrawRect(x-w/2,y-h/2,w,h,gLib2D.BLACK);
+    gBeginRects(cart.texte);
         gSetCoordMode(G_CENTER);
-        if (couleur='[') or (couleur='{') then
-            gSetColor(gLib2D.RED)
-        else
-            gSetColor(gLib2D.BLACK);
+        gSetColor(cart.couleur);
         gSetCoord(x,y-10*echelle);
         gAdd();
     gEnd();
 end;
 
-procedure afficher_cartes(liste:array of carte;font_cartes:PTTF_Font);
-var i:integer;
-    x,y,echelle:real;
+procedure afficher_cartes(liste:array of carte_graph;font_cartes:PTTF_Font;echelle:real=1.0);
+var i,j,k,interval:integer;
+    x,y:real;
 begin
-    if length(liste)>40 then echelle:=0.4
-    else if length(liste)>20 then echelle:=0.5
-    else if length(liste)>10 then echelle:=0.9
-    else echelle:=1;
-    x := (G_SCR_H div 2)-length(liste)*(52*echelle)/2;
-    y := G_SCR_H*0.8;
-    for i:=0 to high(liste) do begin
-        afficher_carte(x,y,liste[i],font_cartes,echelle);
-        x += 51*echelle;
+    interval := 5;
+    x := (G_SCR_H div 2)-min(19,length(liste)-2)*(carte_w+interval)*echelle/2;
+    y := G_SCR_H*0.7;
+    j := 0; i := 0;
+    while i<length(liste) do begin
+        k := i;
+        while j<min(20,length(liste)-k) do begin
+            //writeln('    j=',j,' i=',i);
+            afficher_carte(x,y,liste[i],font_cartes,echelle);
+            x += (carte_w+interval)*echelle;
+            j += 1;
+            i += 1;
         end;
+        //writeln(min(20,length(liste)-k-1),' j=',j,' i=',i);
+        j := 0;
+        y += (carte_h-5)*echelle;
+        x := (G_SCR_H div 2)-min(19,length(liste)-i-1)*((carte_w+interval)*echelle)/2;
+        end;
+    //halt;
 end;
 
 
@@ -103,7 +116,8 @@ var font_noms, font_cartes : PTTF_Font;
     i, players_nbr : integer;
     theta : real;
     players_graph : joueurs_graph;
-    c:carte;
+    c:array of carte_graph;
+    cs:carte;
 begin
     gClear(gLib2D.BLACK);
 
@@ -114,7 +128,7 @@ begin
     w := G_SCR_W; (* Largeur de l'écran *)
     h := G_SCR_H; (* Hauteur de l'écran *)
     font_noms :=  TTF_OpenFont('font_names.ttf', round(G_SCR_W*0.02));
-    font_cartes := TTF_OpenFont('font_cards.ttf', round(G_SCR_W*0.02));
+    font_cartes := TTF_OpenFont('font_cards.ttf', round(G_SCR_W*0.015));
 
     players_nbr := length(players_list);
     SetLength(players_graph,players_nbr);
@@ -134,8 +148,12 @@ begin
         end;
     end;
 
-    c.couleur := 'carreau';
-    c.valeur := 3;
+    SetLength(c,35);
+    for i:=0 to 34 do begin
+        cs.couleur := 'carreau';
+        cs.valeur := 3;
+        c[i] := convert(cs,font_cartes);
+        end;
 
     while true do begin (* Boucle principale *)
 
@@ -150,7 +168,7 @@ begin
 
         afficher_joueurs(players_graph);
 
-        afficher_carte(300,500,c,font_cartes);
+        afficher_cartes(c,font_cartes);
 
         try
         gFlip();
