@@ -33,7 +33,7 @@ begin
 
     players_graph := load_players(joueurs_list); (* initialisation des joueurs *)
     while true do begin (* Boucle principale *)
-        load_background(image); (* chargement du fond *)
+        afficher_background(image); (* chargement du fond *)
         afficher_joueurs(players_graph); (* chargement des joueurs *)
         afficher_cartes(liste_cartes); (* chargement des cartes *)
 
