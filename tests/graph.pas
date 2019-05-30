@@ -9,18 +9,24 @@ interface
 
 uses gLib2D, SDL_TTF, Crt, sysutils, math, classes;
 
-function convert(cart:carte):carte_graph;
-procedure afficher_cartes(liste:array of carte_graph;echelle:real=1.0);
-procedure afficher_joueurs(players_graph:joueurs_graph);
-function init(taille:integer):gImage;
-function load_players(players_list:joueurs):joueurs_graph;
-procedure load_background(image:gImage);
+(* Initialisation *)
+function init(taille:integer):gImage; // initialiser la fenêtre, et créer la référence de l'image de fond (/!\ à appeler en premier)
 
-var font_noms, font_cartes:PTTF_Font;
+(* Convertir les données *)
+function convert(cart:carte):carte_graph; // Convertir une carte basique en une carte compatible avec la lib graphique
+function load_players(players_list:joueurs):joueurs_graph; // Convertir la liste des joueurs de base en une liste utilisable par la lib graphique
+
+(* A appeler dans la boucle while *)
+procedure afficher_cartes(liste:array of carte_graph;echelle:real=1.0); // afficher une liste de cartes, avec possibilité de réduire/augmenter la taille
+procedure afficher_joueurs(players_graph:joueurs_graph); // Afficher la liste des joueurs autours de la "table"
+procedure afficher_background(image:gImage); // Affiche l'image de fond
+
 
 // ---------- PRIVE ------------ //
 
 implementation
+
+var font_noms, font_cartes:PTTF_Font; // polices des textes
 
 function convert(cart:carte):carte_graph;
 var couleur:string;
@@ -137,7 +143,7 @@ begin
     end;
 end;
 
-procedure load_background(image:gImage);
+procedure afficher_background(image:gImage);
 var x,y,w,h:integer;
 begin
     x := G_SCR_W div 2; (* Milieu de l'écran *)
