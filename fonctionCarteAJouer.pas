@@ -139,7 +139,7 @@ Begin
 		end;
 end;
 
-Function Atout (liste:joueurs,n:integer):carte; // n= nbr de cartes par joueur et p=nombre de players
+Function InitAtout(liste:joueurs,n:integer):carte; // n= nbr de cartes par joueur et p=nombre de players
 var d:deck;
 p:integer;
 j,i:integer;
@@ -276,12 +276,13 @@ end;
 
 //pour une manche
 Procedure Manche(var liste:joueurs;n:integer);
-var i,j:integer;
+var i,j:integer; atout:string;
 begin
+	atout:=InitAtout(liste,n);
 	Parions(liste,n);
 	For i:=2 to n do //premier joueur = gagnant tour précédent
 	begin
-		Pli(liste);
+		OrdreJoueur(liste,atout);
 	end;
 end;
 
@@ -295,6 +296,16 @@ begin
 		Manche(liste,i);
 	end;
 		
+end;
+
+//la phase descendante
+Procedure Descendant(liste:joueurs);
+var i:integer;
+begin
+	For i:=x downto 1 do
+	begin
+		
+	end;
 end;
 
 var i,nb:integer; liste:joueurs;
