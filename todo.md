@@ -19,13 +19,22 @@ Distribution des cartes (fait), affichage des cartes pour chaque joueur, demande
 ### • Gestion des manches
 Dans la procédure principale, nous aurons besoin d'appeller la fonction de gestion d'une manche à chaque nouvelle manche, et de gérer le N° de manche, le type de phase (ascendante ou descendante), le nombre de points par joueur, et l'appel de la procédure finale.
 
+### • Intégration du fichier `classes.pas`
+Ce fichier rassemble toutes les classes utilisées, pour avoir exactement les mêmes peu importe l'unit. N'hésitez pas à ajouter vos classes si elles peuvent être utile dans plus d'un fichier.
+
+### • Finir la lib graphique
+Il reste à pouvoir afficher une carte majeure au centre, ainsi que les autres cartes du tour actuel, et la couleur de l'atout. Et peut-être masquer les points des autres joueurs pendant que l'un joue ?
+
+### • Intégration graphique
+Maintenant que la lib graphique fonctionne, il va falloir commencer à l'utiliser. Dans un premier temps pouvoir afficher le deck du joueur actuel, puis les cartes du pli, etc.
+
 ### • Procédure finale
 Prend en arguments la liste des joueurs pour déterminer le gagnant en fonction des points totaux, puis affiche le gagnant et éventuellement quelques stats bonus (nombre de plis par joueur, moyenne des paris etc).
 
 ### • Affichage des cartes dans le terminal
 Si jamais les joueurs veulent jouer dans le terminal, il faut trouver un moyen simple et intuitif d'afficher les cartes d'un joueur (qui peuvent être entre 1 et 26 selon les parties et le nombre de joueurs).
 
-### • Tests sur une interface graphique
+### • ~~Tests sur une interface graphique~~
 Avant de se lancer à la "traduction" du jeu en dessins, il va falloir exécuter quelques tests sur le package `glib2D` : affichage d'éléments graphiques, affichage d'images externes, affichage de texte, détection de clics, champ de texte...
 
 ### • Faire le rapport (En cours(A mince on est pas à l'école ...))
