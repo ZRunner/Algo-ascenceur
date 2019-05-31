@@ -19,11 +19,14 @@ Type
     gAlpha          = byte;
     gEnum           = integer;
 
+VAR
+    G_SCR_W         :integer;
+    G_SCR_H         :integer;
+
 Const
     (* Screen constants *)
-    TITLE = 'Free Pascal - SDL Window';
-    G_SCR_W         = 900;
-    G_SCR_H         = 900;
+    TITLE = 'Ascenceur - Z_Running';
+
     G_VOID          = 0;
 
     (* Colors *)
@@ -61,6 +64,13 @@ Const
     PI              = 3.141592653589;
 
 (* Functions prototypes *)
+
+(*
+    change_size(w,h)
+    * Change la taille de la fenêtre
+*)
+
+procedure change_size(w,h:integer);
 
 (*
     gClear(color);
@@ -624,6 +634,12 @@ var
 	obj_coord_mode : gEnum;
 	obj_tex : gImage;
 
+
+procedure change_size(w,h:integer);
+Begin
+    G_SCR_W := w;
+    G_SCR_H := h;
+end;
 
 procedure _gInit;
 begin
