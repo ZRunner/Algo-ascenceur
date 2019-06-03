@@ -9,6 +9,7 @@ var joueurs_list:classes.joueurs;
     image:classes.background;
     players_graph : joueurs_graph;
     i: integer;
+    t:text_graph;
 begin
     image := init(850); (* initialisation de la fenêtre *)
     SetLength(joueurs_list,5); (* Création de la liste des joueurs *)
@@ -22,11 +23,12 @@ begin
     joueurs_list[3].couleur := green;
     joueurs_list[4].pseudo := 'OxXo';
     joueurs_list[4].couleur := magenta;
+    t := convert_text('hello wooooorld!');
     SetLength(liste_cartes,35); (* Création de cartes de test *)
     for i:=0 to high(liste_cartes) do begin
         une_carte.couleur := 'carreau';
         une_carte.valeur := 3;
-        liste_cartes[i] := convert(une_carte);
+        liste_cartes[i] := convert_carte(une_carte);
         end;
 
 
@@ -36,6 +38,7 @@ begin
         afficher_background(image); (* chargement du fond *)
         afficher_joueurs(players_graph); (* chargement des joueurs *)
         afficher_cartes(liste_cartes); (* chargement des cartes *)
+        afficher_texte(t,convert_couleur(blue));
 
         gFlip();
 
