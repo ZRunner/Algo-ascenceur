@@ -14,6 +14,7 @@ Type joueur=Record // L'un des joueurs
     age:integer;
     couleur:byte;
     pari:integer;
+    point:integer;
     end;
 
 Type config = Record // configuration de la partie
