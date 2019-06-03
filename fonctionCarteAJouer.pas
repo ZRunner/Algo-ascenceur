@@ -304,7 +304,8 @@ var i:integer;
 begin
 	For i:=x downto 1 do
 	begin
-		
+		distribuer(liste,i);
+		Manche(liste,i);
 	end;
 end;
 
