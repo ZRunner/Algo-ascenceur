@@ -7,28 +7,106 @@ Unit graph;
 
 interface
 
-uses gLib2D, SDL_TTF, Crt, sysutils, math, classes;
+uses gLib2D, SDL, SDL_Image, SDL_TTF, Crt, sysutils, math, classes;
 
 (* Initialisation *)
 function init(taille:integer):gImage; // initialiser la fenêtre, et créer la référence de l'image de fond (/!\ à appeler en premier)
 
 (* Convertir les données *)
-function convert(cart:carte):carte_graph; // Convertir une carte basique en une carte compatible avec la lib graphique
+function convert_carte(cart:carte):carte_graph; // Convertir une carte basique en une carte compatible avec la lib graphique
 function load_players(players_list:joueurs):joueurs_graph; // Convertir la liste des joueurs de base en une liste utilisable par la lib graphique
+function convert_text(message:string): text_graph; // Convertir un texte
+function convert_couleur(couleur:byte):color_graph;
 
 (* A appeler dans la boucle while *)
 procedure afficher_cartes(liste:array of carte_graph;echelle:real=1.0); // afficher une liste de cartes, avec possibilité de réduire/augmenter la taille
 procedure afficher_joueurs(players_graph:joueurs_graph); // Afficher la liste des joueurs autours de la "table"
 procedure afficher_background(image:gImage); // Affiche l'image de fond
+procedure afficher_texte(message:text_graph;couleur:color_graph); // Afficher un message
+procedure refresh; // Afficher l'image
+
+(* Partie SDL *)
+function sdl_update : integer; // Retourne 1 lorsque quelque chose bouge sur l'écran (clic etc)
+function sdl_do_quit : boolean; // Si l'utilisateur ferme la fenêtre
+function sdl_get_mouse_x : Uint16; // Coordonnées x de la souris
+function sdl_get_mouse_y : Uint16;
+function sdl_mouse_left_up : boolean; // Si le joueur presse le bouton gauche de la souris
+function sdl_mouse_left_down : boolean; // Si le joueur relâche le bouton gauche
+function sdl_mouse_right_up : boolean;
+function sdl_mouse_right_down : boolean;
+function sdl_get_keypressed : integer; // Si une touche du clavier est pressée, retourne sa valeur (http://www.siteduzero.com/uploads/fr/ftp/mateo21/sdlkeysym.html)
 
 
 // ---------- PRIVE ------------ //
 
 implementation
 
-var font_noms, font_cartes:PTTF_Font; // polices des textes
+var font_noms, font_cartes, font_msg:PTTF_Font; // polices des textes
+    _event : TSDL_Event;
 
-function convert(cart:carte):carte_graph;
+procedure refresh;
+begin
+    gFlip
+end;
+
+function sdl_update : integer;
+begin
+    exit(SDL_PollEvent(@_event));
+end;
+
+function sdl_do_quit : boolean;
+begin
+    exit(_event.type_ = SDL_QUITEV);
+end;
+
+
+function sdl_get_mouse_x : Uint16;
+begin
+    exit(_event.motion.x);
+end;
+
+function sdl_get_mouse_y : Uint16;
+begin
+    exit(_event.motion.y);
+end;
+
+function sdl_mouse_left_up : boolean;
+begin
+    exit((_event.type_ = SDL_MOUSEBUTTONUP)
+    and  (_event.button.button = SDL_BUTTON_LEFT));
+end;
+
+function sdl_mouse_left_down : boolean;
+begin
+    exit((_event.type_ = SDL_MOUSEBUTTONDOWN)
+    and  (_event.button.button = SDL_BUTTON_LEFT));
+end;
+
+function sdl_mouse_right_up : boolean;
+begin
+    exit((_event.type_ = SDL_MOUSEBUTTONUP)
+    and  (_event.button.button = SDL_BUTTON_RIGHT));
+end;
+
+function sdl_mouse_right_down : boolean;
+begin
+    exit((_event.type_ = SDL_MOUSEBUTTONDOWN)
+    and  (_event.button.button = SDL_BUTTON_RIGHT));
+end;
+
+
+function sdl_get_keypressed : integer;
+begin
+    if (_event.type_ <> SDL_KEYDOWN) then
+        exit(-1);
+
+    exit(_event.key.keysym.sym);
+end;
+
+
+
+
+function convert_carte(cart:carte):carte_graph;
 var couleur:string;
 begin
     if font_cartes=nil then
@@ -45,11 +123,39 @@ begin
     else
         couleur := 'Z';
     end;
-    convert.texte := gTextLoad(couleur+inttostr(cart.valeur),font_cartes);
+    convert_carte.texte := gTextLoad(couleur+inttostr(cart.valeur),font_cartes);
     if (couleur='[') or (couleur='{') then
-        convert.couleur := gLib2D.RED
+        convert_carte.couleur := gLib2D.RED
     else
-        convert.couleur := gLib2D.BLACK;
+        convert_carte.couleur := gLib2D.BLACK;
+end;
+
+function convert_text(message:string): text_graph;
+begin
+    convert_text := gTextLoad(message, font_msg);
+end;
+
+function convert_couleur(couleur:byte):color_graph;
+begin
+case couleur OF (* Transformation byte => gColor *)
+    red: convert_couleur := gLib2D.RED;
+    yellow: convert_couleur := gLib2D.YELLOW;
+    blue: convert_couleur := gLib2D.AZURE;
+    green: convert_couleur := gLib2D.GREEN;
+    magenta: convert_couleur := gLib2D.MAGENTA;
+    brown: convert_couleur := gLib2D.ORANGE;
+    else convert_couleur := gLib2D.DARKGRAY;
+end;
+end;
+
+procedure afficher_texte(message:text_graph;couleur:color_graph);
+begin
+    gBeginRects(message);
+        gSetCoordMode(G_CENTER);
+        gSetCoord(G_SCR_W div 2, G_SCR_W*0.2);
+        gSetColor(couleur);
+        gAdd();
+    gEnd();
 end;
 
 procedure afficher_carte(x,y:real;cart:carte_graph;font_cartes:PTTF_Font;echelle:real=1);
@@ -116,6 +222,7 @@ begin
     init := gTexLoad('tex.jpg'); (* Chargement de la texture *)
     font_cartes := TTF_OpenFont('font_cards.ttf', round(G_SCR_W*0.015));
     font_noms := TTF_OpenFont('font_names.ttf', round(G_SCR_W*0.02));
+    font_msg := TTF_OpenFont('font_names.ttf', round(G_SCR_W*0.06));
 end;
 
 function load_players(players_list:joueurs):joueurs_graph;
@@ -131,15 +238,7 @@ begin
         load_players[i].x := round(cos(theta)*G_SCR_W*0.44) + x;
         load_players[i].y := round(sin(theta)*G_SCR_W*0.44) + y;
         load_players[i].pseudo_txt := gTextLoad(players_list[i].pseudo,font_noms);
-        case players_list[i].couleur OF (* Transformation byte => gColor *)
-            red: load_players[i].couleur := gLib2D.RED;
-            yellow: load_players[i].couleur := gLib2D.YELLOW;
-            blue: load_players[i].couleur := gLib2D.AZURE;
-            green: load_players[i].couleur := gLib2D.GREEN;
-            magenta: load_players[i].couleur := gLib2D.MAGENTA;
-            brown: load_players[i].couleur := gLib2D.ORANGE;
-            else load_players[i].couleur := gLib2D.DARKGRAY;
-        end;
+        load_players[i].couleur := convert_couleur(players_list[i].couleur);
     end;
 end;
 
