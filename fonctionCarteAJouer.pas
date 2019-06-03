@@ -310,6 +310,24 @@ begin
 	end;
 end;
 
+Function ComptageDePoint (liste:joueur,n:integer) : joueur ; // n est le nombre de carte distribuer par joueur, Fonction à vérifier
+var d:deck;
+conf:config;
+begin
+conf.win_defaut:=10;
+conf.win:=2;
+d:= init;
+Distribuer(liste);
+Parions(liste,n);
+for i:=1 to NbrManche(conf) do
+begin
+    If Parions(liste):= NbrMache(conf)+1 then
+        joueur.point:= 10 + conf.win*joueur.pari;
+    Else
+        joueur.point:= 10-Abs(Nbr(Manche)-joueur.pari)*conf.win);
+end;
+end;
+
 var i,nb:integer; liste:joueurs;
 begin
 	nb:=InitJoueur();
