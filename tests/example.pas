@@ -23,7 +23,7 @@ begin
     joueurs_list[3].couleur := green;
     joueurs_list[4].pseudo := 'OxXo';
     joueurs_list[4].couleur := magenta;
-    t := convert_text('hello wooooorld!');
+    t := convert_text('slt!');
     SetLength(liste_cartes,35); (* Création de cartes de test *)
     for i:=0 to high(liste_cartes) do begin
         une_carte.couleur := 'carreau';
@@ -39,6 +39,7 @@ begin
         afficher_joueurs(players_graph); (* chargement des joueurs *)
         afficher_cartes(liste_cartes); (* chargement des cartes *)
         afficher_texte(t,convert_couleur(blue));
+        focus_joueur(players_graph[1]);
 
         gFlip();
 
