@@ -16,6 +16,7 @@ Type joueur=Record // L'un des joueurs
     couleur:byte;
     pari:integer;
     point:integer;
+    PliManche:integer; //nombre de pli remporté par manche
     end;
 
 Type config = Record // configuration de la partie
@@ -35,6 +36,7 @@ var d:deck;
     conf:config;
     
 Function InitJoueur():integer; 
+Procedure InitPliManche(var liste:joueurs);
 function inarray(liste:array of carte;card:carte):boolean;
 function init:deck;
 procedure distribuer(var liste:joueurs;n:integer);
@@ -66,6 +68,15 @@ begin
 	readln(n);
 	Exit(n);
 end;
+
+//remise à zéro du nombre de pli réalisé par joueur par manche
+Procedure InitPliManche(var liste:joueurs);
+var i:integer;
+begin
+	For i:=0 to high(liste) do
+		liste[i].PliManche:=0;
+end;
+
 
 // Vérifie si une carte se trouve dans une liste de cartes
 function inarray(liste:array of carte;card:carte):boolean;
@@ -318,15 +329,16 @@ begin
 end;
 
 //pour une manche
-Procedure Manche(var liste:joueurs;n:integer);
+Procedure Manche(var liste:joueurs;n:integer); //n : nombre de cartes par joueur au début de la manche
 var i:integer; atout:carte; color:string;
 begin
 	atout:=InitAtout(liste,n);
 	color:=atout.couleur;
 	Parions(liste,n);
-	For i:=2 to n do //premier joueur = gagnant tour précédent
+	For i:=1 to n do //premier joueur = gagnant tour précédent
 	begin
 		OrdreJoueur(liste,color);
+		liste[0].PliManche:=liste[0].PliManche+1;
 	end;
 end;
 
@@ -357,21 +369,18 @@ end;
 
 // n est le nombre de carte distribuer par joueur, Fonction à vérifier
 Procedure ComptageDePoint(var liste:joueurs;n:integer); 
-var d:deck; i:integer; conf:config;
+var i:integer; conf:config;
 begin
 conf.win_defaut:=10;
 conf.win:=2;
-d:= init;
-Distribuer(liste,n);
-Parions(liste,n);
-for i:=1 to NombreManche(conf) do
+for i:=0 to high(liste) do
 begin
-	Parions(liste,n);
-    If  liste[i].pari = NombreManche(conf)+1 then
+    If  liste[i].pari = liste[i].PliManche then
         liste[i].point:= 10 + conf.win*liste[i].pari
     Else
-        liste[i].point:= 10-Abs(NombreManche(conf)-liste[i].pari)*conf.win;
+        liste[i].point:= 10-Abs(liste[i].pari-liste[i].PliManche)*conf.win;
 end;
+	InitPliManche(liste);
 end;
 
 end.
