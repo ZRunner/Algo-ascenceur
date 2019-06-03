@@ -20,7 +20,8 @@ Type config = Record // configuration de la partie
     win:integer;
     loose:integer;
     min_age:integer;
-    max_age:integer
+    max_age:integer;
+    default_window_size:integer;
     end;
 
 Type deck = array[0..51] of carte; // Liste de toutes les cartes du jeu, triées
@@ -76,7 +77,7 @@ begin
         readln(fic,ligne);
         ligne := Trim(ligne);
         loadfile := loadfile+ligne;
-    until eof(fic); 
+    until eof(fic);
     close(fic);
 end;
 
@@ -93,11 +94,12 @@ begin
     loadconfig.loose := jObject.Get('loose');
     loadconfig.min_age := jObject.Get('min_age');
     loadconfig.max_age := jObject.Get('max_age');
+    loadconfig.default_window_size := jObject.Get('default_window');
 end;
 
 // Création d'un joueur, avec son pseudo, sa couleur et son age
 function creerjoueur(couleur:byte;colorname:string):joueur;
-var age:integer;pseudo:string;ok:boolean; 
+var age:integer;pseudo:string;ok:boolean;
 begin
     textcolor(couleur);
     creerjoueur.couleur := couleur;
