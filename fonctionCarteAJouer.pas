@@ -140,7 +140,7 @@ Begin
 		end;
 end;
 
-Function InitAtout(liste:joueurs,n:integer):carte; // n= nbr de cartes par joueur et p=nombre de players
+Function InitAtout(liste:joueurs;n:integer):carte; // n= nbr de cartes par joueur et p=nombre de players
 var d:deck;
 p:integer;
 j,i:integer;
@@ -159,7 +159,7 @@ Begin
 		i:=i+1;
 		end;
 end;
-Atout:=T[0];
+InitAtout:=T[0];
 end;
 
 Procedure NombreManche(var conf:config); // Calcule le nombre de manches dans une partie en fonction du nombre de joueurs.
