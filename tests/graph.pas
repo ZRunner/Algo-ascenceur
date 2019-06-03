@@ -24,6 +24,7 @@ procedure afficher_joueurs(players_graph:joueurs_graph); // Afficher la liste de
 procedure afficher_background(image:gImage); // Affiche l'image de fond
 procedure afficher_texte(message:text_graph;couleur:color_graph); // Afficher un message
 procedure refresh; // Afficher l'image
+procedure focus_joueur(joueur:joueur_graph); // Affiche le pseudo d'un joueur en haut à gauche de l'écran
 
 (* Partie SDL *)
 function sdl_update : integer; // Retourne 1 lorsque quelque chose bouge sur l'écran (clic etc)
@@ -94,7 +95,6 @@ begin
     and  (_event.button.button = SDL_BUTTON_RIGHT));
 end;
 
-
 function sdl_get_keypressed : integer;
 begin
     if (_event.type_ <> SDL_KEYDOWN) then
@@ -154,6 +154,21 @@ begin
         gSetCoordMode(G_CENTER);
         gSetCoord(G_SCR_W div 2, G_SCR_W*0.2);
         gSetColor(couleur);
+        gAdd();
+    gEnd();
+end;
+
+procedure focus_joueur(joueur:joueur_graph);
+var x,y:real;
+begin
+    x := G_SCR_W*0.08;
+    y := G_SCR_H*0.05;
+    gFillRect(x-G_SCR_W*0.07,y-G_SCR_H*0.02,G_SCR_W*0.14,G_SCR_H*0.04,joueur.couleur);
+    gDrawRect(x-G_SCR_W*0.07,y-G_SCR_H*0.02,G_SCR_W*0.14,G_SCR_H*0.04,gLib2D.BLACK);
+    gBeginRects(joueur.pseudo_txt);
+        gSetCoordMode(G_CENTER);
+        gSetCoord(x,y);
+        gSetColor(gLib2D.BLACK);
         gAdd();
     gEnd();
 end;
