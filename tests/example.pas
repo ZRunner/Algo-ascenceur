@@ -6,6 +6,7 @@ uses gLib2D, graph, classes, sysutils, Crt;
 var joueurs_list:classes.joueurs;
     une_carte:classes.carte;
     liste_cartes:array of classes.carte_graph;
+    liste_manche:array[0..4] of classes.carte_graph;
     image:classes.background;
     players_graph : joueurs_graph;
     i: integer;
@@ -24,11 +25,12 @@ begin
     joueurs_list[4].pseudo := 'OxXo';
     joueurs_list[4].couleur := magenta;
     t := convert_text('slt!');
-    SetLength(liste_cartes,35); (* Création de cartes de test *)
+    SetLength(liste_cartes,52); (* Création de cartes de test *)
     for i:=0 to high(liste_cartes) do begin
         une_carte.couleur := 'carreau';
-        une_carte.valeur := 3;
+        une_carte.valeur := round(random*10)+1;
         liste_cartes[i] := convert_carte(une_carte);
+        if i<5 then liste_manche[i] := convert_carte(une_carte);
         end;
 
 
@@ -41,6 +43,7 @@ begin
         afficher_cartes(liste_cartes); (* chargement des cartes *)
         afficher_texte(t,convert_couleur(blue));
         focus_joueur(players_graph[1]);
+        afficher_manche(liste_manche);
 
         gFlip();
 
