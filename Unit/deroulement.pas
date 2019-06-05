@@ -53,6 +53,7 @@ Function VerifDroitDePoser(paquet:joueur;choix,prems:carte):boolean;
 Function Pli(var liste:joueurs; atout:string):integer;
 Procedure RetirePaquet(var Jo:joueur;choix:carte);
 Procedure OrdreJoueur(var liste:joueurs;atout:string); 
+Procedure AfficheScore(liste:joueurs);
 Procedure Manche(var liste:joueurs;n:integer);
 Procedure Ascendant(liste:joueurs;conf:config);
 Procedure Descendant(liste:joueurs;conf:config);
