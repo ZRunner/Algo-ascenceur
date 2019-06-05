@@ -36,6 +36,7 @@ begin
     players_graph := load_players(joueurs_list); (* initialisation des joueurs *)
     while true do begin (* Boucle principale *)
         afficher_background(image); (* chargement du fond *)
+        afficher_atout(une_carte);
         afficher_joueurs(players_graph); (* chargement des joueurs *)
         afficher_cartes(liste_cartes); (* chargement des cartes *)
         afficher_texte(t,convert_couleur(blue));
