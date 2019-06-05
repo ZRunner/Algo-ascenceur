@@ -328,6 +328,16 @@ begin
 	end;
 end;
 
+//pour afficher les scores en chaque fin de manche
+Procedure AfficheScore(liste:joueurs);
+Var i:integer;
+begin
+	For i:=0 to high(liste) do
+	begin
+		writeln(liste[i].pseudo, ' : ', liste[i].point);
+	end;
+end;
+
 //pour une manche
 Procedure Manche(var liste:joueurs;n:integer); //n : nombre de cartes par joueur au début de la manche
 var i:integer; atout:carte; color:string;
@@ -340,6 +350,8 @@ begin
 		OrdreJoueur(liste,color);
 		liste[0].PliManche:=liste[0].PliManche+1;
 	end;
+	ComptageDePoint(liste,n);
+	AfficheScore(liste);
 end;
 
 //la phase ascendante
@@ -376,9 +388,9 @@ conf.win:=2;
 for i:=0 to high(liste) do
 begin
     If  liste[i].pari = liste[i].PliManche then
-        liste[i].point:= 10 + conf.win*liste[i].pari
+        liste[i].point := liste[i].point + 10 + conf.win*liste[i].pari
     Else
-        liste[i].point:= 10-Abs(liste[i].pari-liste[i].PliManche)*conf.win;
+        liste[i].point := liste[i].point + 10-Abs(liste[i].pari-liste[i].PliManche)*conf.win;
 end;
 	InitPliManche(liste);
 end;
