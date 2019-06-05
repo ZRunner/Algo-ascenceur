@@ -25,6 +25,8 @@ procedure afficher_background(image:gImage); // Affiche l'image de fond
 procedure afficher_texte(message:text_graph;couleur:color_graph); // Afficher un message
 procedure refresh; // Afficher l'image
 procedure focus_joueur(joueur:joueur_graph); // Affiche le pseudo d'un joueur en haut à gauche de l'écran
+procedure afficher_atout(cart:carte); // Affiche la couleur de l'atout actuel
+
 
 (* Partie SDL *)
 function sdl_update : integer; // Retourne 1 lorsque quelque chose bouge sur l'écran (clic etc)
@@ -42,7 +44,7 @@ function sdl_get_keypressed : integer; // Si une touche du clavier est pressée,
 
 implementation
 
-var font_noms, font_cartes, font_msg:PTTF_Font; // polices des textes
+var font_noms, font_cartes, font_msg, font_atout :PTTF_Font; // polices des textes
     _event : TSDL_Event;
 
 procedure refresh;
@@ -173,6 +175,36 @@ begin
     gEnd();
 end;
 
+procedure afficher_atout(cart:carte);
+var txt,txt2:gImage;
+    x,y:real;
+begin
+    if font_atout=nil then font_atout := TTF_OpenFont('font_cards.ttf', round(G_SCR_W*0.53));
+    CASE cart.couleur OF
+        'carreau': txt := gTextLoad('[',font_atout);
+        'pique': txt := gTextLoad('}',font_atout);
+        'trèfle': txt := gTextLoad(']',font_atout);
+        'coeur': txt := gTextLoad('{',font_atout);
+    else
+        txt := gTextLoad('Z',font_atout);
+    end;
+    txt2 := gTextLoad('Atout',font_noms);
+    x := G_SCR_W*0.93;
+    y := G_SCR_H*0.06;
+    gBeginRects(txt);
+        gSetCoordMode(G_CENTER);
+        gSetCoord(x,y);
+        gSetColor(gLib2D.BLACK);
+        gAdd();
+    gEnd();
+    gBeginRects(txt2);
+        gSetCoordMode(G_CENTER);
+        gSetCoord(x,y-G_SCR_H*0.035);
+        gSetColor(gLib2D.BLACK);
+        gAdd();
+    gEnd();
+end;
+
 procedure afficher_carte(x,y:real;cart:carte_graph;font_cartes:PTTF_Font;echelle:real=1);
 var w,h:real;
 begin
@@ -238,6 +270,7 @@ begin
     font_cartes := TTF_OpenFont('font_cards.ttf', round(G_SCR_W*0.015));
     font_noms := TTF_OpenFont('font_names.ttf', round(G_SCR_W*0.02));
     font_msg := TTF_OpenFont('font_names.ttf', round(G_SCR_W*0.06));
+    font_atout := TTF_OpenFont('font_cards.ttf', round(G_SCR_W*0.053));
 end;
 
 function load_players(players_list:joueurs):joueurs_graph;
