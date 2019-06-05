@@ -25,6 +25,9 @@ procedure afficher_background(image:gImage); // Affiche l'image de fond
 procedure afficher_texte(message:text_graph;couleur:color_graph); // Afficher un message
 procedure refresh; // Afficher l'image
 procedure focus_joueur(joueur:joueur_graph); // Affiche le pseudo d'un joueur en haut à gauche de l'écran
+procedure afficher_atout(cart:carte); // Affiche la couleur de l'atout actuel
+procedure afficher_manche(liste:array of carte_graph); // Affiche la liste des cartes jouées
+
 
 (* Partie SDL *)
 function sdl_update : integer; // Retourne 1 lorsque quelque chose bouge sur l'écran (clic etc)
@@ -42,7 +45,7 @@ function sdl_get_keypressed : integer; // Si une touche du clavier est pressée,
 
 implementation
 
-var font_noms, font_cartes, font_msg:PTTF_Font; // polices des textes
+var font_noms, font_cartes, font_msg, font_atout, font_manche :PTTF_Font; // polices des textes
     _event : TSDL_Event;
 
 procedure refresh;
@@ -123,7 +126,8 @@ begin
     else
         couleur := 'Z';
     end;
-    convert_carte.texte := gTextLoad(couleur+inttostr(cart.valeur),font_cartes);
+    convert_carte.texte_petit := gTextLoad(couleur+inttostr(cart.valeur),font_cartes);
+    convert_carte.texte_grand := gTextLoad(couleur+inttostr(cart.valeur),font_manche);
     if (couleur='[') or (couleur='{') then
         convert_carte.couleur := gLib2D.RED
     else
@@ -173,14 +177,49 @@ begin
     gEnd();
 end;
 
-procedure afficher_carte(x,y:real;cart:carte_graph;font_cartes:PTTF_Font;echelle:real=1);
+procedure afficher_atout(cart:carte);
+var txt,txt2:gImage;
+    x,y:real;
+begin
+    if font_atout=nil then font_atout := TTF_OpenFont('font_cards.ttf', round(G_SCR_W*0.53));
+    CASE cart.couleur OF
+        'carreau': txt := gTextLoad('[',font_atout);
+        'pique': txt := gTextLoad('}',font_atout);
+        'trèfle': txt := gTextLoad(']',font_atout);
+        'coeur': txt := gTextLoad('{',font_atout);
+    else
+        txt := gTextLoad('Z',font_atout);
+    end;
+    txt2 := gTextLoad('Atout',font_noms);
+    x := G_SCR_W*0.93;
+    y := G_SCR_H*0.06;
+    gBeginRects(txt);
+        gSetCoordMode(G_CENTER);
+        gSetCoord(x,y);
+        if (cart.couleur='pique') or (cart.couleur='trèfle') then
+            gSetColor(gLib2D.BLACK)
+        else gSetColor(gLib2D.RED);
+        gAdd();
+    gEnd();
+    gBeginRects(txt2);
+        gSetCoordMode(G_CENTER);
+        gSetCoord(x,y-G_SCR_H*0.035);
+        gSetColor(gLib2D.BLACK);
+        gAdd();
+    gEnd();
+end;
+
+procedure afficher_carte(x,y:real;cart:carte_graph;echelle:real=1);
 var w,h:real;
 begin
-    w := G_SCR_W*0.033*echelle;
+    w := G_SCR_W*0.036*echelle;
     h := G_SCR_H*0.056*echelle;
     gFillRect(x-w/2,y-h/2,w,h,gLib2D.WHITE);
     gDrawRect(x-w/2,y-h/2,w,h,gLib2D.BLACK);
-    gBeginRects(cart.texte);
+    if echelle<2 then
+        gBeginRects(cart.texte_petit)
+    else
+        gBeginRects(cart.texte_grand);
         gSetCoordMode(G_CENTER);
         gSetColor(cart.couleur);
         gSetCoord(x,y-10*echelle);
@@ -192,25 +231,45 @@ procedure afficher_cartes(liste:array of carte_graph;echelle:real=1.0);
 var i,j,k,interval:integer;
     x,y:real;
 begin
-    interval := 5;
+    interval := 7;
     x := (G_SCR_H div 2)-min(19,length(liste)-2)*(G_SCR_W*0.033+interval)*echelle/2;
     y := G_SCR_H*0.65;
     j := 0; i := 0;
     while i<length(liste) do begin
         k := i;
         while j<min(20,length(liste)-k) do begin
-            //writeln('    j=',j,' i=',i);
-            afficher_carte(x,y,liste[i],font_cartes,echelle);
+            afficher_carte(x,y,liste[i],echelle);
             x += (G_SCR_W*0.033+interval)*echelle;
             j += 1;
             i += 1;
         end;
-        //writeln(min(20,length(liste)-k-1),' j=',j,' i=',i);
         j := 0;
         y += (G_SCR_H*0.056-5)*echelle;
         x := (G_SCR_H div 2)-min(19,length(liste)-i-1)*((G_SCR_W*0.033+interval)*echelle)/2;
         end;
-    //halt;
+end;
+
+procedure afficher_manche(liste:array of carte_graph);
+var i,j,k,interval:integer;
+    x,y:real;
+begin
+    interval := 7;
+    x := (G_SCR_H div 2)-min(5,length(liste)-2)*(G_SCR_W*0.033+interval)/2;
+    y := G_SCR_H*0.65;
+    j := 0; i := 0;
+    while i<length(liste) do begin
+        k := i;
+        while j<min(20,length(liste)-k) do begin
+            afficher_carte(x,y,liste[i],2.8);
+            x += (G_SCR_W*0.033+interval);
+            j += 1;
+            i += 1;
+        end;
+        j := 0;
+        y += (G_SCR_H*0.056-5);
+        x := (G_SCR_H div 2)-min(19,length(liste)-i-1)*((G_SCR_W*0.033+interval))/2;
+    end;
+
 end;
 
 
@@ -238,6 +297,8 @@ begin
     font_cartes := TTF_OpenFont('font_cards.ttf', round(G_SCR_W*0.015));
     font_noms := TTF_OpenFont('font_names.ttf', round(G_SCR_W*0.02));
     font_msg := TTF_OpenFont('font_names.ttf', round(G_SCR_W*0.06));
+    font_atout := TTF_OpenFont('font_cards.ttf', round(G_SCR_W*0.053));
+    font_manche := TTF_OpenFont('font_cards.ttf', round(G_SCR_W*0.027));
 end;
 
 function load_players(players_list:joueurs):joueurs_graph;
