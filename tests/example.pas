@@ -3,15 +3,15 @@ program gui;
 uses gLib2D, graph, classes, sysutils, Crt;
 
 
-var joueurs_list:classes.joueurs;
+var joueurs_list:classes.joueursArray;
     une_carte:classes.carte;
-    liste_cartes:array of classes.carte;
+    liste_cartes:CartesArray;
     liste_manche:array[0..4] of classes.carte;
     image:classes.background;
-    players_graph : joueurs;
-    i: integer;
-    t:text_graph;
+    i,t: integer;
+    text:text_graph;
 begin
+    randomize;
     image := init(850); (* initialisation de la fenêtre *)
     SetLength(joueurs_list,5); (* Création de la liste des joueurs *)
     joueurs_list[0].pseudo := 'Z_runner';
@@ -24,26 +24,30 @@ begin
     joueurs_list[3].couleur := green;
     joueurs_list[4].pseudo := 'OxXo';
     joueurs_list[4].couleur := magenta;
-    t := convert_text('Welcome!');
-    SetLength(liste_cartes,31); (* Création de cartes de test *)
+    text := convert_text('Welcome!');
+    SetLength(liste_cartes,33); (* Création de cartes de test *)
     for i:=0 to high(liste_cartes) do begin
         une_carte.couleur := 'carreau';
         une_carte.valeur := round(random*10)+1;
         liste_cartes[i] := convert_carte(une_carte);
         if i<5 then liste_manche[i] := convert_carte(une_carte);
         end;
+    joueurs_list := load_players(joueurs_list); (* initialisation des joueurs *)
+    set_deck(liste_cartes);
+    set_cartes_main(liste_manche);
+    set_joueur(joueurs_list[round(random*4)]);
 
+    t := 0;
 
-
-    players_graph := load_players(joueurs_list); (* initialisation des joueurs *)
     while true do begin (* Boucle principale *)
         afficher_background(image); (* chargement du fond *)
         afficher_atout(une_carte);
-        afficher_joueurs(players_graph); (* chargement des joueurs *)
-        afficher_cartes(liste_cartes); (* chargement des cartes *)
-        afficher_texte(t,convert_couleur(blue));
-        focus_joueur(players_graph[1]);
-        afficher_manche(liste_manche);
+        afficher_joueurs(joueurs_list); (* chargement des joueurs *)
+        afficher_cartes; (* chargement des cartes *)
+        afficher_texte(text,convert_couleur(blue));
+        focus_joueur;
+        afficher_manche;
+        afficher_cadre();
 
         gFlip();
 
@@ -51,6 +55,12 @@ begin
             if (sdl_do_quit) then (* Clic sur la croix pour fermer *)
                 exit;
 
-        sleep(100);
+        sleep(10);
+
+        t += 1;
+        (* if t>5 then begin
+            set_joueur(joueurs_list[round(random*4)]);
+            t := 0;
+            end; *)
     end;
 end.
