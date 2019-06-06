@@ -1,6 +1,6 @@
 program gui;
 
-uses gLib2D, graph, classes, sysutils, Crt;
+uses graph, classes, sysutils, Crt;
 
 
 var joueurs_list:classes.joueursArray;
@@ -27,44 +27,48 @@ begin
     text := convert_text('Welcome!');
     SetLength(liste_cartes,33); (* Création de cartes de test *)
     for i:=0 to high(liste_cartes) do begin
-        une_carte.couleur := 'carreau';
+        if random>0.5 then
+            une_carte.couleur := 'carreau'
+        else
+            une_carte.couleur := 'pique';
         une_carte.valeur := round(random*10)+1;
         liste_cartes[i] := une_carte;
         convert_carte(liste_cartes[i]);
         if i<3 then liste_manche[i] := liste_cartes[i];
         if i=high(liste_cartes) then atout := une_carte;
         end;
-    joueurs_list := load_players(joueurs_list); (* initialisation des joueurs *)
-    set_deck(liste_cartes);
-    set_cartes_main(liste_manche);
-    set_joueur(joueurs_list[round(random*4)]);
+    load_players(joueurs_list); (* initialisation des joueurs *)
+    set_deck(liste_cartes); (* initialisation des cartes de deck *)
+    set_cartes_main(liste_manche); (* initialisation des cartes au milieu de la table *)
+    set_joueur(joueurs_list[round(random*4)]); (* ajout d'un joueur random en focus *)
 
     t := 0;
 
     while true do begin (* Boucle principale *)
         afficher_background(image); (* chargement du fond *)
-        afficher_atout(atout);
-        afficher_joueurs(joueurs_list); (* chargement des joueurs *)
+        afficher_atout(atout); (* chargement de la couleur de l'atout *)
+        afficher_joueurs(joueurs_list); (* chargement/affichage des joueurs *)
         afficher_cartes; (* chargement des cartes *)
-        afficher_texte(text,convert_couleur(blue));
-        focus_joueur;
-        afficher_manche;
-        afficher_cadre();
+        afficher_texte(text,convert_couleur(blue)); (* affichage d'un texte *)
+        focus_joueur; (* affichage du joueur en focus *)
+        afficher_manche; (* affichage des cartes jouées *)
+        afficher_cadre(); (* affichage d'un cadre au survol d'une carte *)
 
-        gFlip();
+        refresh(); (* mise à jour de l'image avec les données précédemment chargées *)
 
 
         while (sdl_update = 1) do begin (* si la fenêtre se met à jour (mouvement de la souris) *)
             if (sdl_do_quit) then (* Clic sur la croix pour fermer *)
                 exit;
-                une_carte := on_click;
-                if une_carte.valeur<>-1 then writeln('carte cliquée: ',une_carte.valeur);
+                une_carte := on_click; (* détection d'un clic ? *)
+                if une_carte.valeur<>-1 then (* si une carte a été cliquée *)
+                    writeln('carte cliquée: ',une_carte.valeur); 
             end;
 
-        sleep(10);
+        sleep(10); (* temps de rafraîchissement minimal de l'image, en ms *)
 
         t += 1;
-         if t>50 then begin
+         if t>50 then begin (* juste pour tester le focus des joueurs et vérifier le rafraîchissement de l'image *)
             set_joueur(joueurs_list[round(random*4)]);
             t := 0;
             end;

@@ -12,41 +12,42 @@ uses gLib2D, SDL, SDL_Image, SDL_TTF, Crt, sysutils, math, classes;
 type twarray = array[0..1] of integer;
 
 (* Initialisation *)
-function init(taille:integer):gImage; // initialiser la fenêtre, et créer la référence de l'image de fond (/!\ à appeler en premier)
-procedure set_deck(cartes:cartesArray);
-procedure set_cartes_main(cartes:cartesArray);
-procedure set_joueur(player:joueur);
+function init(taille:integer):gImage; // Initialiser la fenêtre, et créer la référence de l'image de fond (/!\ à appeler en premier)
+procedure set_deck(cartes:cartesArray); // Définir la liste des cartes à afficher dans la partie inférieure
+procedure set_cartes_main(cartes:cartesArray); // Définir la liste des cartes à afficher en grand
+procedure set_joueur(player:joueur); // Définir le joueur apparaissant en haut à gauche (focus)
 
 
 (* Convertir les données *)
-procedure convert_carte(var cart:carte); // Convertir une carte basique en une carte compatible avec la lib graphique
-function load_players(players_list:joueursArray):joueursArray; // Convertir la liste des joueurs de base en une liste utilisable par la lib graphique
+procedure convert_carte(var cart:carte); // Complète une carte pour y ajouter les infos nécessaires à la lib graphique
+procedure load_players(var players_list:joueursArray); // Convertir la liste des joueurs de base en une liste utilisable par la lib graphique
 function convert_text(message:string): text_graph; // Convertir un texte
-function convert_couleur(couleur:byte):color_graph;
+function convert_couleur(couleur:byte):color_graph; // Convertir une couleur
 
 (* A appeler dans la boucle while *)
-procedure afficher_cartes; // afficher une liste de cartes, avec possibilité de réduire/augmenter la taille
-procedure afficher_joueurs(players_graph:joueursArray); // Afficher la liste des joueurs autours de la "table"
+procedure refresh; // Afficher l'image
+procedure afficher_cartes; // afficher la liste de cartes (partie inférieure)
+procedure afficher_joueurs(players_graph:joueursArray); // Afficher la liste des joueurs
 procedure afficher_background(image:gImage); // Affiche l'image de fond
 procedure afficher_texte(message:text_graph;couleur:color_graph); // Afficher un message
-procedure refresh; // Afficher l'image
 procedure focus_joueur; // Affiche le pseudo d'un joueur en haut à gauche de l'écran
 procedure afficher_atout(cart:carte); // Affiche la couleur de l'atout actuel
 procedure afficher_manche; // Affiche la liste des cartes jouées
-procedure afficher_cadre;
+procedure afficher_cadre; // Affiche un cadre autours de la carte visée par la souris
 
 
 (* Partie SDL *)
 function sdl_update : integer; // Retourne 1 lorsque quelque chose bouge sur l'écran (clic etc)
 function sdl_do_quit : boolean; // Si l'utilisateur ferme la fenêtre
-function sdl_get_mouse_xy : twarray; // Coordonnées x de la souris
-function sdl_get_mouse_y : Uint16;
+function sdl_get_mouse_xy : twarray; // Coordonnées (x,y) de la souris
+function sdl_get_mouse_x : Uint16; // Coordonnées x de la souris
+function sdl_get_mouse_y : Uint16; // Coordonnées y de la souris
 function sdl_mouse_left_up : boolean; // Si le joueur presse le bouton gauche de la souris
 function sdl_mouse_left_down : boolean; // Si le joueur relâche le bouton gauche
 function sdl_mouse_right_up : boolean;
 function sdl_mouse_right_down : boolean;
 function sdl_get_keypressed : integer; // Si une touche du clavier est pressée, retourne sa valeur (http://www.siteduzero.com/uploads/fr/ftp/mateo21/sdlkeysym.html)
-function on_click(main:boolean=False):carte;
+function on_click(main:boolean=False):carte; // Retourne une carte cliquée par le joueur (si aucune carte n'est visée, carte.valeur prend -1)
 
 
 // ---------- PRIVE ------------ //
@@ -81,6 +82,12 @@ begin
     sdl_get_mouse_xy[0] := _event.motion.x;
     sdl_get_mouse_xy[1] := _event.motion.y;
 end;
+
+function sdl_get_mouse_x : Uint16;
+begin
+    exit(_event.motion.x);
+end;
+
 
 function sdl_get_mouse_y : Uint16;
 begin
@@ -381,20 +388,19 @@ begin
     font_manche := TTF_OpenFont('font_cards.ttf', round(G_SCR_W*0.028));
 end;
 
-function load_players(players_list:joueursArray):joueursArray;
+procedure load_players(var players_list:joueursArray);
 var i, players_nbr, x, y:integer;
     theta:real;
 begin
     players_nbr := length(players_list);
     x := G_SCR_W div 2;
     y := G_SCR_H div 2;
-    SetLength(load_players,players_nbr);
     for i:=0 to players_nbr-1 do begin (* Initialisation des positions et des couleurs *)
         theta := 2*pi/players_nbr*i;
-        load_players[i].x := round(cos(theta)*G_SCR_W*0.44) + x;
-        load_players[i].y := round(sin(theta)*G_SCR_W*0.44) + y;
-        load_players[i].pseudo_txt := gTextLoad(players_list[i].pseudo,font_noms);
-        load_players[i].gcouleur := convert_couleur(players_list[i].couleur);
+        players_list[i].x := round(cos(theta)*G_SCR_W*0.44) + x;
+        players_list[i].y := round(sin(theta)*G_SCR_W*0.44) + y;
+        players_list[i].pseudo_txt := gTextLoad(players_list[i].pseudo,font_noms);
+        players_list[i].gcouleur := convert_couleur(players_list[i].couleur);
     end;
 end;
 
