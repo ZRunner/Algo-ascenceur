@@ -19,6 +19,9 @@ Type config = Record // configuration de la partie
 Type carte = Record // L'une des 52 cartes du jeu
     couleur:string;
     valeur:integer;
+    gcouleur:gColor;
+    texte_petit:gImage;
+    texte_grand:gImage;
 end;
 
 Type joueur=Record // L'un des joueurs
@@ -26,25 +29,16 @@ Type joueur=Record // L'un des joueurs
     pseudo:string;
     age:integer;
     couleur:byte;
+    gcouleur:gColor;
+    x,y:integer;
+    pseudo_txt:gImage;
     end;
 Type joueurs=array of joueur;
 
 
 Type deck = array[0..51] of carte; // Liste de toutes les cartes du jeu, triées
 
-type joueur_graph=Record // uniquement les infos utiles
-    pseudo:string;
-    couleur:gColor;
-    x,y:integer;
-    pseudo_txt:gImage;
-end;
-Type joueurs_graph=array of joueur_graph;
 
-type carte_graph=Record
-    couleur:gColor;
-    texte_petit:gImage;
-    texte_grand:gImage;
-end;
 
 type text_graph=gImage; // texte lisible par la lib graphique
 type color_graph=gColor;
