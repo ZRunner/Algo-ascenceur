@@ -5,10 +5,10 @@ uses gLib2D, graph, classes, sysutils, Crt;
 
 var joueurs_list:classes.joueurs;
     une_carte:classes.carte;
-    liste_cartes:array of classes.carte_graph;
-    liste_manche:array[0..4] of classes.carte_graph;
+    liste_cartes:array of classes.carte;
+    liste_manche:array[0..4] of classes.carte;
     image:classes.background;
-    players_graph : joueurs_graph;
+    players_graph : joueurs;
     i: integer;
     t:text_graph;
 begin
@@ -24,8 +24,8 @@ begin
     joueurs_list[3].couleur := green;
     joueurs_list[4].pseudo := 'OxXo';
     joueurs_list[4].couleur := magenta;
-    t := convert_text('slt!');
-    SetLength(liste_cartes,52); (* Création de cartes de test *)
+    t := convert_text('Welcome!');
+    SetLength(liste_cartes,31); (* Création de cartes de test *)
     for i:=0 to high(liste_cartes) do begin
         une_carte.couleur := 'carreau';
         une_carte.valeur := round(random*10)+1;
@@ -51,6 +51,6 @@ begin
             if (sdl_do_quit) then (* Clic sur la croix pour fermer *)
                 exit;
 
-        sleep(50);
+        sleep(100);
     end;
 end.
