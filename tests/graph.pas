@@ -13,20 +13,20 @@ uses gLib2D, SDL, SDL_Image, SDL_TTF, Crt, sysutils, math, classes;
 function init(taille:integer):gImage; // initialiser la fenêtre, et créer la référence de l'image de fond (/!\ à appeler en premier)
 
 (* Convertir les données *)
-function convert_carte(cart:carte):carte_graph; // Convertir une carte basique en une carte compatible avec la lib graphique
-function load_players(players_list:joueurs):joueurs_graph; // Convertir la liste des joueurs de base en une liste utilisable par la lib graphique
+function convert_carte(cart:carte):carte; // Convertir une carte basique en une carte compatible avec la lib graphique
+function load_players(players_list:joueurs):joueurs; // Convertir la liste des joueurs de base en une liste utilisable par la lib graphique
 function convert_text(message:string): text_graph; // Convertir un texte
 function convert_couleur(couleur:byte):color_graph;
 
 (* A appeler dans la boucle while *)
-procedure afficher_cartes(liste:array of carte_graph;echelle:real=1.0); // afficher une liste de cartes, avec possibilité de réduire/augmenter la taille
-procedure afficher_joueurs(players_graph:joueurs_graph); // Afficher la liste des joueurs autours de la "table"
+procedure afficher_cartes(liste:array of carte;echelle:real=1.0); // afficher une liste de cartes, avec possibilité de réduire/augmenter la taille
+procedure afficher_joueurs(players_graph:joueurs); // Afficher la liste des joueurs autours de la "table"
 procedure afficher_background(image:gImage); // Affiche l'image de fond
 procedure afficher_texte(message:text_graph;couleur:color_graph); // Afficher un message
 procedure refresh; // Afficher l'image
-procedure focus_joueur(joueur:joueur_graph); // Affiche le pseudo d'un joueur en haut à gauche de l'écran
+procedure focus_joueur(joueur:joueur); // Affiche le pseudo d'un joueur en haut à gauche de l'écran
 procedure afficher_atout(cart:carte); // Affiche la couleur de l'atout actuel
-procedure afficher_manche(liste:array of carte_graph); // Affiche la liste des cartes jouées
+procedure afficher_manche(liste:array of carte); // Affiche la liste des cartes jouées
 
 
 (* Partie SDL *)
@@ -109,7 +109,7 @@ end;
 
 
 
-function convert_carte(cart:carte):carte_graph;
+function convert_carte(cart:carte):carte;
 var couleur:string;
 begin
     if font_cartes=nil then
@@ -129,9 +129,9 @@ begin
     convert_carte.texte_petit := gTextLoad(couleur+inttostr(cart.valeur),font_cartes);
     convert_carte.texte_grand := gTextLoad(couleur+inttostr(cart.valeur),font_manche);
     if (couleur='[') or (couleur='{') then
-        convert_carte.couleur := gLib2D.RED
+        convert_carte.gcouleur := gLib2D.RED
     else
-        convert_carte.couleur := gLib2D.BLACK;
+        convert_carte.gcouleur := gLib2D.BLACK;
 end;
 
 function convert_text(message:string): text_graph;
@@ -162,12 +162,12 @@ begin
     gEnd();
 end;
 
-procedure focus_joueur(joueur:joueur_graph);
+procedure focus_joueur(joueur:joueur);
 var x,y:real;
 begin
     x := G_SCR_W*0.08;
     y := G_SCR_H*0.05;
-    gFillRect(x-G_SCR_W*0.07,y-G_SCR_H*0.02,G_SCR_W*0.14,G_SCR_H*0.04,joueur.couleur);
+    gFillRect(x-G_SCR_W*0.07,y-G_SCR_H*0.02,G_SCR_W*0.14,G_SCR_H*0.04,joueur.gcouleur);
     gDrawRect(x-G_SCR_W*0.07,y-G_SCR_H*0.02,G_SCR_W*0.14,G_SCR_H*0.04,gLib2D.BLACK);
     gBeginRects(joueur.pseudo_txt);
         gSetCoordMode(G_CENTER);
@@ -209,7 +209,7 @@ begin
     gEnd();
 end;
 
-procedure afficher_carte(x,y:real;cart:carte_graph;echelle:real=1);
+procedure afficher_carte(x,y:real;cart:carte;echelle:real=1);
 var w,h:real;
 begin
     w := G_SCR_W*0.036*echelle;
@@ -221,13 +221,13 @@ begin
     else
         gBeginRects(cart.texte_grand);
         gSetCoordMode(G_CENTER);
-        gSetColor(cart.couleur);
+        gSetColor(cart.gcouleur);
         gSetCoord(x,y-10*echelle);
         gAdd();
     gEnd();
 end;
 
-procedure afficher_cartes(liste:array of carte_graph;echelle:real=1.0);
+procedure afficher_cartes(liste:array of carte;echelle:real=1.0);
 var i,j,k,interval:integer;
     x,y:real;
 begin
@@ -249,31 +249,21 @@ begin
         end;
 end;
 
-procedure afficher_manche(liste:array of carte_graph);
+procedure afficher_manche(liste:array of carte);
 var i,j,k,interval:integer;
     x,y:real;
 begin
-    interval := 7;
-    x := (G_SCR_H div 2)-min(5,length(liste)-2)*(G_SCR_W*0.033+interval)/2;
-    y := G_SCR_H*0.65;
-    j := 0; i := 0;
-    while i<length(liste) do begin
-        k := i;
-        while j<min(20,length(liste)-k) do begin
-            afficher_carte(x,y,liste[i],2.8);
-            x += (G_SCR_W*0.033+interval);
-            j += 1;
-            i += 1;
+    interval := 10;
+    x := (G_SCR_H div 2)-(length(liste)-1)*(G_SCR_W*0.1+interval)/2;
+    y := G_SCR_H*0.5;
+    for i:=low(liste) to high(liste) do begin
+        afficher_carte(x,y,liste[i],2.8);
+        x += (G_SCR_W*0.1+interval);
         end;
-        j := 0;
-        y += (G_SCR_H*0.056-5);
-        x := (G_SCR_H div 2)-min(19,length(liste)-i-1)*((G_SCR_W*0.033+interval))/2;
-    end;
-
 end;
 
 
-procedure afficher_joueurs(players_graph:joueurs_graph);
+procedure afficher_joueurs(players_graph:joueurs);
 var i,players_nbr:integer;
 Begin
     players_nbr := length(players_graph);
@@ -284,7 +274,7 @@ Begin
             gSetColor(gLib2D.BLACK);
             gAdd();
         gEnd();
-    gFillCircle(players_graph[i].x,players_graph[i].y, G_SCR_W*0.025, players_graph[i].couleur);
+    gFillCircle(players_graph[i].x,players_graph[i].y, G_SCR_W*0.025, players_graph[i].gcouleur);
 end;
 end;
 
@@ -301,7 +291,7 @@ begin
     font_manche := TTF_OpenFont('font_cards.ttf', round(G_SCR_W*0.027));
 end;
 
-function load_players(players_list:joueurs):joueurs_graph;
+function load_players(players_list:joueurs):joueurs;
 var i, players_nbr, x, y:integer;
     theta:real;
 begin
@@ -314,7 +304,7 @@ begin
         load_players[i].x := round(cos(theta)*G_SCR_W*0.44) + x;
         load_players[i].y := round(sin(theta)*G_SCR_W*0.44) + y;
         load_players[i].pseudo_txt := gTextLoad(players_list[i].pseudo,font_noms);
-        load_players[i].couleur := convert_couleur(players_list[i].couleur);
+        load_players[i].gcouleur := convert_couleur(players_list[i].couleur);
     end;
 end;
 
