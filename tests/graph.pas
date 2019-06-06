@@ -19,7 +19,7 @@ procedure set_joueur(player:joueur);
 
 
 (* Convertir les données *)
-function convert_carte(cart:carte):carte; // Convertir une carte basique en une carte compatible avec la lib graphique
+procedure convert_carte(var cart:carte); // Convertir une carte basique en une carte compatible avec la lib graphique
 function load_players(players_list:joueursArray):joueursArray; // Convertir la liste des joueurs de base en une liste utilisable par la lib graphique
 function convert_text(message:string): text_graph; // Convertir un texte
 function convert_couleur(couleur:byte):color_graph;
@@ -46,6 +46,7 @@ function sdl_mouse_left_down : boolean; // Si le joueur relâche le bouton gauch
 function sdl_mouse_right_up : boolean;
 function sdl_mouse_right_down : boolean;
 function sdl_get_keypressed : integer; // Si une touche du clavier est pressée, retourne sa valeur (http://www.siteduzero.com/uploads/fr/ftp/mateo21/sdlkeysym.html)
+function on_click(main:boolean=False):carte;
 
 
 // ---------- PRIVE ------------ //
@@ -57,6 +58,7 @@ var font_noms, font_cartes, font_msg, font_atout, font_manche :PTTF_Font; // pol
     cartes_deck : cartesArray;
     cartes_main : cartesArray;
     joueur_actif : joueur;
+    clic_actif : boolean;
 
 procedure refresh;
 begin
@@ -119,8 +121,7 @@ end;
 
 
 
-
-function convert_carte(cart:carte):carte;
+procedure convert_carte(var cart:carte);
 var couleur:string;
 begin
     if font_cartes=nil then
@@ -137,12 +138,12 @@ begin
     else
         couleur := 'Z';
     end;
-    convert_carte.texte_petit := gTextLoad(couleur+inttostr(cart.valeur),font_cartes);
-    convert_carte.texte_grand := gTextLoad(couleur+inttostr(cart.valeur),font_manche);
+    cart.texte_petit := gTextLoad(couleur+inttostr(cart.valeur),font_cartes);
+    cart.texte_grand := gTextLoad(couleur+inttostr(cart.valeur),font_manche);
     if (couleur='[') or (couleur='{') then
-        convert_carte.gcouleur := gLib2D.RED
+        cart.gcouleur := gLib2D.RED
     else
-        convert_carte.gcouleur := gLib2D.BLACK;
+        cart.gcouleur := gLib2D.BLACK;
 end;
 
 function convert_text(message:string): text_graph;
@@ -230,10 +231,10 @@ begin
         gBeginRects(cart.texte_petit)
     else
         gBeginRects(cart.texte_grand);
-        gSetCoordMode(G_CENTER);
-        gSetColor(cart.gcouleur);
-        gSetCoord(x,y-10*echelle);
-        gAdd();
+    gSetCoordMode(G_CENTER);
+    gSetColor(cart.gcouleur);
+    gSetCoord(x,y-10*echelle);
+    gAdd();
     gEnd();
 end;
 
@@ -274,23 +275,41 @@ begin
     gDrawRect(c.x-c.w/2-1,c.y-c.h/2-1,c.w+2,c.h+2,color);
 end;
 
-procedure afficher_cadre;
+function detect_carte(main:boolean):carte;
 var coo:array[0..1] of integer;
     cart:carte;
 begin
     coo := sdl_get_mouse_xy;
-    for cart in cartes_main do
-        if (coo[0]>cart.x-cart.w/2) and (coo[0]<cart.x+cart.w/2) and (coo[1]<cart.y+cart.h/2) and (coo[1]>cart.y-cart.h/2) then begin
-            _cadre(cart,gLib2D.RED);
-            exit;
-        end;
+    if main then
+        for cart in cartes_main do
+            if (coo[0]>cart.x-cart.w/2) and (coo[0]<cart.x+cart.w/2) and (coo[1]<cart.y+cart.h/2) and (coo[1]>cart.y-cart.h/2) then
+                exit(cart);
     for cart in cartes_deck do
-        if (coo[0]>cart.x-cart.w/2) and (coo[0]<cart.x+cart.w/2) and (coo[1]<cart.y+cart.h/2) and (coo[1]>cart.y-cart.h/2) then begin
-            _cadre(cart,gLib2D.VIOLET);
-            exit;
-        end;
+        if (coo[0]>cart.x-cart.w/2) and (coo[0]<cart.x+cart.w/2) and (coo[1]<cart.y+cart.h/2) and (coo[1]>cart.y-cart.h/2) then
+            exit(cart);
+    detect_carte.valeur := -1;
 end;
 
+procedure afficher_cadre;
+var cart:carte;
+begin
+    cart := detect_carte(True);
+    if cart.valeur>0 then
+        _cadre(cart,gLib2D.VIOLET);
+end;
+
+function on_click(main:boolean=False):carte;
+var cart:carte;
+begin
+    if (not clic_actif) and sdl_mouse_left_down then
+        clic_actif := True;
+    if clic_actif and sdl_mouse_left_up then begin
+        cart := detect_carte(main);
+        exit(cart);
+        clic_actif := False;
+        end;
+    on_click.valeur := -1;
+end;
 
 
 
@@ -330,7 +349,10 @@ procedure set_cartes_main(cartes:cartesArray);
 var i,interval:integer;
     x,y,w,h:real;
 begin
-    SetLength(cartes_main,length(cartes));
+    i := 0;
+    while cartes[i].valeur>0 do i += 1;
+    SetLength(cartes_main,i);
+    SetLength(cartes,i);
     interval := 10;
     x := (G_SCR_H div 2)-(length(cartes)-1)*(G_SCR_W*0.1+interval)/2;
     y := G_SCR_H*0.5;
