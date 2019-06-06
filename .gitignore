@@ -5,4 +5,5 @@
 !LICENSE
 !*.pdf
 !*.json
+!*.jpg
 !tests/
