@@ -254,7 +254,12 @@ end;
 
 //pour un tour, renvoit un entier qui est le numéro du gagnant dans la liste actuelle
 Function Pli(var liste:joueurs; atout:string):integer;
-var i:integer; T:array of carte; choix:carte; best:integer;
+var 
+	i:integer; 
+	T:array of carte; 
+	choix:carte; 
+	best:integer; 
+	liste_pli:array[0..4] of classes.carte;
 begin
 	setlength(T,high(liste));
 	T[0].couleur:=ChoixCarte(liste[0]).couleur;
@@ -366,6 +371,51 @@ begin
 		distribuer(liste,i);
 		Manche(liste,i);
 	end;
+end;
+
+// Création d'un joueur, avec son pseudo, sa couleur et son age
+function creerjoueur(couleur:byte;colorname:string):joueur;
+var age:integer;pseudo:string;ok:boolean;
+begin
+    textcolor(couleur);
+    creerjoueur.couleur := couleur;
+    write('Joueur ',colorname,', indiquez votre pseudo',#10,'> ');readln(pseudo);
+    {$I-}   {compiler directive, removes abort on IO error}
+    write('Indiquez votre âge',#10,'> ');readln(age);
+    while (conf.min_age>age) or (age>conf.max_age) or (IOResult <> 0) do begin
+        ok := IOResult=0;
+        write('Indiquez votre âge',#10,'> ');readln(age);
+    end;
+    {$I+}   {restores default IO checking}
+    creerjoueur.age := age;
+    creerjoueur.pseudo := pseudo;
+    writeln;
+end;
+
+// Création de la liste de tous les joueurs
+procedure creerjoueurs(var liste:joueurs);
+var i:integer;
+    cls:array[0..6] of byte=(red,yellow,blue,green,Magenta,Brown,LightGray);
+    clsn:array[0..6] of string=('Rouge','Jaune','Bleu','Vert','Violet','Marron','Blanc');
+begin
+    for i:=0 to high(liste) do
+        liste[i] := creerjoueur(cls[i],clsn[i]);
+    normvideo;
+end;
+
+Procedure Partie(var liste:joueurs; conf:config);
+Var
+	image:classes.background;
+	liste_cartes:cartes;
+	n:integer;
+begin
+	n:=InitJoueur();
+	setlength(liste, n);
+	creerjoueurs(liste);
+	liste:=load_players(liste);
+	//faire l'affichage global du jeu puis le déroulement avec les deux procedure et 
+	//rajouter dans les fonctions les changements de paquets dans le graphisme.
+	
 end;
 
 end.
