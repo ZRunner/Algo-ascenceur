@@ -39,14 +39,14 @@ procedure afficher_cadre;
 (* Partie SDL *)
 function sdl_update : integer; // Retourne 1 lorsque quelque chose bouge sur l'écran (clic etc)
 function sdl_do_quit : boolean; // Si l'utilisateur ferme la fenêtre
-function sdl_get_mouse_xy : twarray; // Coordonnées x de la souris
+function sdl_get_mouse_xy : twarray; // Coordonnées x - y de la souris
 function sdl_get_mouse_y : Uint16;
 function sdl_mouse_left_up : boolean; // Si le joueur presse le bouton gauche de la souris
 function sdl_mouse_left_down : boolean; // Si le joueur relâche le bouton gauche
 function sdl_mouse_right_up : boolean;
 function sdl_mouse_right_down : boolean;
 function sdl_get_keypressed : integer; // Si une touche du clavier est pressée, retourne sa valeur (http://www.siteduzero.com/uploads/fr/ftp/mateo21/sdlkeysym.html)
-function on_click(main:boolean=False):carte;
+function on_click(main:boolean=False):carte; // Retourne la carte où le joueur a cliqué
 
 
 // ---------- PRIVE ------------ //
