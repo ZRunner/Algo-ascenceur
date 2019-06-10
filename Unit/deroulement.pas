@@ -311,6 +311,22 @@ begin
 	end;
 end;
 
+// n est le nombre de carte distribuer par joueur, Fonction à vérifier
+Procedure ComptageDePoint(var liste:joueurs;n:integer); 
+var i:integer; conf:config;
+begin
+conf.win_defaut:=10;
+conf.win:=2;
+for i:=0 to high(liste) do
+begin
+    If  liste[i].pari = liste[i].PliManche then
+        liste[i].point := liste[i].point + 10 + conf.win*liste[i].pari
+    Else
+        liste[i].point := liste[i].point + 10-Abs(liste[i].pari-liste[i].PliManche)*conf.win;
+end;
+	InitPliManche(liste);
+end;
+
 //pour une manche
 Procedure Manche(var liste:joueurs;n:integer); //n : nombre de cartes par joueur au début de la manche
 var i:integer; atout:carte; color:string;
@@ -350,22 +366,6 @@ begin
 		distribuer(liste,i);
 		Manche(liste,i);
 	end;
-end;
-
-// n est le nombre de carte distribuer par joueur, Fonction à vérifier
-Procedure ComptageDePoint(var liste:joueurs;n:integer); 
-var i:integer; conf:config;
-begin
-conf.win_defaut:=10;
-conf.win:=2;
-for i:=0 to high(liste) do
-begin
-    If  liste[i].pari = liste[i].PliManche then
-        liste[i].point := liste[i].point + 10 + conf.win*liste[i].pari
-    Else
-        liste[i].point := liste[i].point + 10-Abs(liste[i].pari-liste[i].PliManche)*conf.win;
-end;
-	InitPliManche(liste);
 end;
 
 end.
