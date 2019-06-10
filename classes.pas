@@ -39,9 +39,9 @@ Type joueur = Record // L'un des joueurs
     pseudo_txt : gImage;
 end;
 
-Type joueursArray = array of joueur;
 Type deck = array[0..51] of carte; // Liste de toutes les cartes du jeu, triées
-Type joueurs = array of joueur; // Liste de tous les joueurs du jeu
+Type joueurs = array of joueur; // Liste de tous les joueurs du jeu dans l'unit deroulement
+Type joueursArray = array of joueur; //dans l'unit graph
 
 type text_graph = gImage; // texte lisible par la lib graphique
 type color_graph = gColor;
