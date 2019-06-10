@@ -3,34 +3,6 @@ UNIT deroulement;
 interface
 uses fpjson, jsonparser, Intro, Crt, sysutils;
 
-
-Type carte = Record // L'une des 52 cartes du jeu
-    couleur:string;
-    valeur:integer;
-    end;
-
-Type joueur=Record // L'un des joueurs
-    cartes:array of carte;
-    pseudo:string;
-    age:integer;
-    couleur:byte;
-    pari:integer;
-    point:integer;
-    PliManche:integer; //nombre de pli remporté par manche
-    end;
-
-Type config = Record // configuration de la partie
-    players:integer;
-    win_defaut:integer;
-    win:integer;
-    loose:integer;
-    min_age:integer;
-    max_age:integer
-    end;
-
-Type deck = array[0..51] of carte; // Liste de toutes les cartes du jeu, triées
-Type joueurs=array of joueur; // Liste de tous les joueurs du jeu
-
 var d:deck;
     liste:joueurs;
     conf:config;
