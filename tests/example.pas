@@ -8,7 +8,7 @@ var joueurs_list:classes.joueursArray;
     liste_cartes:CartesArray;
     liste_manche:array[0..4] of classes.carte;
     image:classes.background;
-    i,t: integer;
+    a,i,t: integer;
     text:text_graph;
 begin
     randomize;
@@ -42,7 +42,7 @@ begin
     set_cartes_main(liste_manche); (* initialisation des cartes au milieu de la table *)
     set_joueur(joueurs_list[round(random*4)]); (* ajout d'un joueur random en focus *)
 
-    t := 0;
+    t := 0; a:=0;
 
     while true do begin (* Boucle principale *)
         afficher_background(image); (* chargement du fond *)
@@ -56,11 +56,21 @@ begin
 
         refresh(); (* mise à jour de l'image avec les données précédemment chargées *)
 
+        if a=0 then begin
+            saisir_txt_context;
+            a := 1;
+            End
+        else begin
+            saisir_txt('hey');
+            a := 0;
+        end;
+
 
         while (sdl_update = 1) do begin (* si la fenêtre se met à jour (mouvement de la souris) *)
             if (sdl_do_quit) then (* Clic sur la croix pour fermer *)
                 exit;
             une_carte := on_click;
+
             if une_carte.valeur<>-1 then
                 writeln('carte cliquée: ',une_carte.valeur);
             end;
