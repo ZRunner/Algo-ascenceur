@@ -1,7 +1,7 @@
 UNIT deroulement;
 
 interface
-uses fpjson, jsonparser, Intro, Crt, sysutils;
+uses fpjson, jsonparser, Intro, classes, Crt, sysutils;
 
 var d:deck;
     liste:joueurs;
