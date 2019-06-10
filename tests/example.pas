@@ -37,7 +37,7 @@ begin
         if i<3 then liste_manche[i] := liste_cartes[i];
         if i=high(liste_cartes) then atout := une_carte;
         end;
-    load_players(joueurs_list); (* initialisation des joueurs *)
+    joueurs_list := load_players(joueurs_list); (* initialisation des joueurs *)
     set_deck(liste_cartes); (* initialisation des cartes de deck *)
     set_cartes_main(liste_manche); (* initialisation des cartes au milieu de la table *)
     set_joueur(joueurs_list[round(random*4)]); (* ajout d'un joueur random en focus *)
@@ -60,9 +60,9 @@ begin
         while (sdl_update = 1) do begin (* si la fenêtre se met à jour (mouvement de la souris) *)
             if (sdl_do_quit) then (* Clic sur la croix pour fermer *)
                 exit;
-                une_carte := on_click; (* détection d'un clic ? *)
-                if une_carte.valeur<>-1 then (* si une carte a été cliquée *)
-                    writeln('carte cliquée: ',une_carte.valeur); 
+            une_carte := on_click;
+            if une_carte.valeur<>-1 then
+                writeln('carte cliquée: ',une_carte.valeur);
             end;
 
         sleep(10); (* temps de rafraîchissement minimal de l'image, en ms *)
