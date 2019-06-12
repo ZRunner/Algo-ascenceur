@@ -104,10 +104,11 @@ begin
 	m:=n+1;
 	For i:=0 to high(liste) do
 	begin
+        graph.set_joueur(liste[i]);
 		k:=-1;
 		While (k<0) or (k>m) do
 		begin
-			k:=saisir_txt('Combien de plis pensez-vous remportez ?',2,true);
+			k := StrToInt(saisir_txt('Combien de plis pensez-vous remportez ?',2,true));
 			(* 2 : pari = nombre de 2 chiffres max
 			* true : le joueur ne peut rentrer que des chiffres *)
 		end;
