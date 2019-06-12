@@ -1116,6 +1116,10 @@ var
     text_surf : PSDL_Surface;
     tex : gImage;
 begin
+    if font=nil then begin
+        writeln('ERREUR lors du chargement de la police : ',TTF_GetError());
+        halt;
+    end;
     If not(start) Then
 		_gStart;
 
@@ -1126,7 +1130,6 @@ begin
     new(tex);
 
     text_surf := TTF_RenderText_Blended(font, PChar(text), white_sdl);
-
     _gSurfToTex(tex, text_surf);
     SDL_FreeSurface(text_surf);
 
