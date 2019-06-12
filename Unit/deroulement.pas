@@ -447,7 +447,7 @@ begin
 	setlength(liste, n);
 	creerjoueurs(liste);
 	liste:=load_players(liste);
-	afficher_joueurs(joueurs_list); (* chargement/affichage des joueurs *)
+	afficher_joueurs(); (* chargement/affichage des joueurs *)
 	plusJeune(liste);
 	afficher_background(image); (* chargement du fond *)
 	Ascendant(liste,conf);
