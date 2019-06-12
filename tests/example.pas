@@ -40,6 +40,7 @@ begin
     set_deck(liste_cartes); (* initialisation des cartes de deck *)
     set_cartes_main(liste_manche); (* initialisation des cartes au milieu de la table *)
     set_joueur(joueurs_list[round(random*4)]); (* ajout d'un joueur random en focus *)
+    set_fps(50); (* 50 images par seconde max (évite les lags) *)
 
     t := 0; a:=0;
 
@@ -67,7 +68,6 @@ begin
                 writeln('carte cliquée: ',une_carte.valeur);
             end;
 
-        sleep(10); (* temps de rafraîchissement minimal de l'image, en ms *)
 
         t += 1;
          if t>50 then begin (* juste pour tester le focus des joueurs et vérifier le rafraîchissement de l'image *)
