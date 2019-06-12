@@ -57,8 +57,15 @@ begin
 
         refresh(); (* mise à jour de l'image avec les données précédemment chargées *)
 
+        // if a=0 then begin
+        //     saisir_txt_context;
+        //     a := 1;
+        //     End
+        // else begin
         if t>45 then
-            writeln('result :',saisir_txt('Entrez votre pari')); (* Demander une saisie *)
+            writeln('result :',saisir_txt('Entrez votre pari',2;true)); (* texte à afficher, longueur max, chiffre seulement *)
+        //     a := 0;
+        // end;
 
 
         while (sdl_update = 1) do begin (* si la fenêtre se met à jour (mouvement de la souris) *)
