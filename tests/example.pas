@@ -7,8 +7,9 @@ var joueurs_list:classes.joueursArray;
     une_carte,atout:classes.carte;
     liste_cartes:CartesArray;
     liste_manche:array[0..4] of classes.carte;
-    a,i,t: integer;
+    i,t: integer;
     text:text_graph;
+    input:string;
 begin
     randomize;
     init(850); (* initialisation de la fenêtre *)
@@ -36,18 +37,18 @@ begin
         if i<3 then liste_manche[i] := liste_cartes[i];
         if i=high(liste_cartes) then atout := une_carte;
         end;
-    joueurs_list := load_players(joueurs_list); (* initialisation des joueurs *)
+    load_players(joueurs_list); (* initialisation des joueurs *)
     set_deck(liste_cartes); (* initialisation des cartes de deck *)
     set_cartes_main(liste_manche); (* initialisation des cartes au milieu de la table *)
     set_joueur(joueurs_list[round(random*4)]); (* ajout d'un joueur random en focus *)
-    set_fps(50); (* 50 images par seconde max (évite les lags) *)
+    set_fps(40); (* 50 images par seconde max (évite les lags) *)
 
-    t := 0; a:=0;
+    t := 0;
 
     while true do begin (* Boucle principale *)
         afficher_background; (* chargement du fond *)
         afficher_atout(atout); (* chargement de la couleur de l'atout *)
-        afficher_joueurs(joueurs_list); (* chargement/affichage des joueurs *)
+        afficher_joueurs; (* chargement/affichage des joueurs *)
         afficher_cartes; (* chargement des cartes *)
         afficher_texte(text,convert_couleur(blue)); (* affichage d'un texte *)
         focus_joueur; (* affichage du joueur en focus *)
@@ -56,7 +57,12 @@ begin
 
         refresh(); (* mise à jour de l'image avec les données précédemment chargées *)
 
-        writeln('result :',saisir_txt('Entrez votre pari',2,true)); (* texte à afficher, longueur max, chiffre seulement *)
+        if t>99 then begin
+            input := saisir_txt('Entrez la nouvelle largeur d''ecran',3,true); (* texte à afficher, longueur max, chiffre seulement *)
+            init(StrToInt(input)); (* changement de la taille d'écran *)
+            load_players(joueurs_list); (* rechargement de la police à cause du changement de taille*)
+            text := convert_text('Welcome!'); (* idem *)
+            end;
 
 
         while (sdl_update = 1) do begin (* si la fenêtre se met à jour (mouvement de la souris) *)
@@ -70,8 +76,7 @@ begin
 
 
         t += 1;
-         if t>50 then begin (* juste pour tester le focus des joueurs et vérifier le rafraîchissement de l'image *)
-            set_joueur(joueurs_list[round(random*4)]);
+         if t>100 then begin (* juste pour faire une boucle paske c koul *)
             t := 0;
             end;
 
