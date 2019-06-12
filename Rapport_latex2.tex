@@ -62,6 +62,7 @@
 A la fin de la partie, le joueur possédant le plus de point à l'aide des contracts/paris gagnent la partie.  Attention, les jokers ne font pas partie du jeu.}
 		\item {Dans un second temps, on va créer un algorithme nommé "Version'Ordinateur'" qui reprendra l'algorithme précédent mais qui va implémenter des joueurs artificiels, qui devront chercher à gagner à tout prix (Il s'agit donc d'une IA qui aura les mêmes pensées qu'un humain). On devra considérer une IA comme un humain, c'est-à-dire qu'il jouera exactement la même chose que ce que l'homme jouerai. } \\
 		\\
+	\end{itemize}
 	
 	\begin{figure}
 	%\includegraphics[scale=0.30]{jeu-de-cartes-magicien-bicycle-stripper.jpg}
@@ -74,7 +75,7 @@ A la fin de la partie, le joueur possédant le plus de point à l'aide des contr
 
 		
 \section{Explication des algorithmes}
-Pour commencer voici comment est construit le code . tout part d'un programme principal\textit{start.pas} c'est ce programme qui lance toutes les fonctions secondaire et  les appellenjt dans le bon ordre et  qui permettent le bon déroulement du jeux . De surcroit ce programme appel des unités il faudra donc le compilé que tout fonctionne correctement    
+Pour commencer voici comment est construit le code . tout part d'un programme principal\textit{start.pas} c'est ce programme qui lance toutes les fonctions secondaire et  les appellenjt dans le bon ordre et  qui permettent le bon déroulement du jeux. De surcroit ce programme appel des unités il faudra donc le compilé que tout fonctionne correctement    
  \subsection{Programmeur}
   
    \subsubsection{programme principal: start.pas}
@@ -89,36 +90,93 @@ Pour commencer voici comment est construit le code . tout part d'un programme pr
    	Ce unit est particulièrement simple car il ne demande a l'utilisateur que si il souhaite lire les régles du jeu tout simplement 
  	\subsubsection{déroulement.pas}
   Ce unit est initalement le coeur du programme il fait donc appel à 11 fonctions et 9 procédure . Ces dernières sont :
+  
   \begin{itemize}
-  
-  
-  \item \textbf{Function Initjoueur}:
-  \item \textbf{Function inarray}:
-  \item \textbf{Function init}:
+  \item \textbf{Function Initjoueur}: qui demande le nombre de joueurs présent dans la partie 
+  \item \textbf{Function inarray}: vérifie la présence d'une carte dans la liste
+  \item \textbf{Function init}: Crée le paquet de carte 
+  \item \textbf{Function initplimanche}: permet de ramener le nombre de plis des joueurs a zéro avant la nouvelle manche
   \item \textbf{Function InitAtout}:
-  \item \textbf{Function NombreManche}:
-  \item \textbf{Function VerifcouleurExiste}:
-  \item \textbf{Function Randomdeck}:
-  \item \textbf{Function VerifvaleurExiste}:
-  \item \textbf{Function VerifieCareAjoueur}:
-  \item \textbf{Function ChoixCarte}:
-  \item \textbf{Function VerifDroitDePoser}:
-  \item \textbf{Function pli}:
-  \item \textbf{Procedure RetirePaquet}:
-  \item \textbf{Procedure OrdreJoueur}:
-  \item \textbf{Procedure Manche}:
-  \item \textbf{Procedure Ascendant}:
-  \item \textbf{Procedure Descandant}:
-  \item \textbf{Procedure ComptageDePoint}:
-  \item \textbf{Procedure distribuer}:
-  \item \textbf{Procedure Parions}:
-  \item \textbf{Procedure plusjeune}:
+  \item \textbf{Function NombreManche}: Calcul le nombre de manches nécessaires vis-à-vis du nombre de joueur
+  \item \textbf{Function VerifcouleurExiste}: Verifie la couleur de cartes séléctionner par le joueur
+  \item \textbf{Function Randomdeck}: Mélange les cartes avec un 		   \textit{random}
+  \item \textbf{Function VerifvaleurExiste} : Verifie la valeur de la carte choisi
+  \item \textbf{Function VerifieCareAjoueur} : Verifie que le joueur possède la carte qu'il a selectionné 
+  \item \textbf{Function ChoixCarte}: appliques les verifications sur le choix des cartes 
+  \item \textbf{Function VerifDroitDePoser}: Vérifie si la cartes peut-être poser sans enfreindre les régles 
+  \item \textbf{Function pli}: a la fin d'un tour renvoi un entier pour désigner le gagnant 
+  \item \textbf{RecherchePseudoGagnant}: retrouve le nom du gagnant et lui associe un victoire et l'enregistre 
+  \item \textbf{Procedure RetirePaquet}: Retire la carte du paquet une fois sélectionner 
+  \item \textbf{Procedure OrdreJoueur}: Permet de determiné et d'appliquer l'ordre de jeu des joueurs pour le prochain pli
+  \item \textbf{Procedure Manche}: Applique les etats d'une manche a savoir le nombre de cartes au joueurs et l'enregistrement des paris 
+  \item \textbf{Procedure Ascendant}: donne une carte de plus a chaque joueur
+  \item \textbf{Procedure Descandant}: retire une carte a chaque joueur 
+  \item \textbf{Procedure ComptageDePoint}: Compte le nombre de point associé aux joueurs 
+  \item \textbf{Procedure distribuer}: Distribue les cartes aux joueurs et empêche le doublon de carte 
+  \item \textbf{Procedure Parions}: Demandes aux joueurs d'entrer la valeurs de leurs mise et les enregistres dans la variable joueurs en debut de manche 
+  \item \textbf{Procedure plusjeune}: change la liste des joueurs pour trié les joueurs par ages du plus jeune au plus vieux et designé le premier joueur a jouer pour la 1er manche 
+  \item 
   \end{itemize}
-  \\
   
+  \subsubsection{unit graphique}
+	
+	brah  
+  
+  \begin{itemize}
+  \item \textbf{Function init}: initialiser la fenêtre, et créer la référence de l'image de fond (/! à appeler en premier)
+  \item \textbf{Procédure set\_deck} : initialise la liste des cartes présente dans le deck
+  \item \textbf{procedure set\_cartes\_main}: defini les cartes dans les mains du joueur
+  \item \textbf{procedure set\_joueur}: defini à qui c'est de jouer dans le petit rectangle en haut a gauche 
+  \item \textbf{procedure set\_fps} : initialise le nombre d'images par seconde 
+\item \textbf{procedure convert\_carte}(var cart:carte) : Convertir une carte basique en une carte compatible avec la lib graphique
+\item \textbf{function load\_players}(players\_list:joueursArray): Convertir la liste des joueurs de base en une liste utilisable par la lib graphique
+\item \textbf{function convert\_text}(message:string): Convertir un texte
+\item \textbf{function convert\_couleur} : Permet de convertir le type custom en bit aifn que pascal comprenne la couleur
 
-\section{Diffultés et conclusion}
-
-			
+\item \textbf{procedure afficher\_cartes}: afficher une liste de cartes, avec possibilité de réduire/augmenter la taille
+\item \textbf{procedure afficher\_joueurs}: Afficher la liste des joueurs autours de la "table"
+\item \textbf{procedure afficher\_background}: Affiche l'image de fond
+\item \textbf{procedure afficher\_texte}: Affiche un message
+\item \textbf{procedure refresh}: Afficher l'image
+\item \textbf{procedure focus\_joueur}: Affiche le pseudo d'un joueur en haut à gauche de l'écran
+\item \textbf{procedure afficher\_atout}(cart:carte): Affiche la couleur de l'atout actuel
+\item \textbf{procedure afficher\_manche} : Affiche la liste des cartes jouées
+\item \textbf{procedure afficher\_cadre}: affiche le cadre autour de la carte survolées par la souris 
+\item \textbf{function on\_click}: Retourne la carte où le joueur a cliqué
+\item  \textbf{function saisir\_txt ]} :  demande à l'utilisateur de saisir du texte
+\item \textbf{function sdl\_update } : Retourne 1 lorsque quelque chose bouge sur l'écran (clic etc)
+\item \textbf{function sdl\_do\_quit} : Si l'utilisateur ferme la fenêtre
+\item \textbf{function sdl\_get\_mouse\_xy} : Coordonnées x - y de la souris
+\item \textbf{function sdl\_get\_keypressed} : Si une touche du clavier est pressée, retourne sa valeur
 	\end{itemize}
+
+\section{Diffultés }
+	\subsection{Coeur du programme}
+	
+	\subsection{unité grahique}
+(probleme packet... etc a toi de voir artur )
+
+\section{Nos choix pour l'implentation}
+	\subsection{coeur de programme}
+Durant le codage de ce programme nous avons fais le choix de composé notre programme de unit et d'un multitude de fonction. En effet cela nous permet  d'en avoir fait deux ou trois était d'avoir un code plus lisible et sourtout de moins commettre d'erreur ou de la trouver plus de faciliter a trouver cette dernière 
+de crée plusieurs fonctions et procédure cela nous permet d'organiser le programme et de pourvoir appelé ces dernières plus facilement. 
+	\subsection{unit}
+redimensions de la fenêtre ,
+\section{avantages et limites}
+
+
+\section{contribution des éléves}
+\subsection{Arthur Blaise}
+	Arthur s'est oocupé de l'unité graphique durant le projet 
+\subsection{Amelie Guedes et Victor Alain}
+ Amelie et Victor ce sont occupé du coeur du programme 
+\subsection{Loann Pottier}
+Loann s'est occupé du rapport 
+\section{Bilan personnel}
+\subsection{Amélie Guedes}
+\subsection{Arthur Blaise}
+\subsection{Victor ALain}
+\subsection{Pottier Loann}
+\section{Conclusion}
+			
 \end{document}
