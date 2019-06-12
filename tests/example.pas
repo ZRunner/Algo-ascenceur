@@ -7,12 +7,11 @@ var joueurs_list:classes.joueursArray;
     une_carte,atout:classes.carte;
     liste_cartes:CartesArray;
     liste_manche:array[0..4] of classes.carte;
-    image:classes.background;
     a,i,t: integer;
     text:text_graph;
 begin
     randomize;
-    image := init(850); (* initialisation de la fenêtre *)
+    init(850); (* initialisation de la fenêtre *)
     SetLength(joueurs_list,5); (* Création de la liste des joueurs *)
     joueurs_list[0].pseudo := 'Z_runner';
     joueurs_list[0].couleur := red;
@@ -22,7 +21,7 @@ begin
     joueurs_list[2].couleur := blue;
     joueurs_list[3].pseudo := 'Awhikax';
     joueurs_list[3].couleur := green;
-    joueurs_list[4].pseudo := 'OxXo';
+    joueurs_list[4].pseudo := 'loann';
     joueurs_list[4].couleur := magenta;
     text := convert_text('Welcome!');
     SetLength(liste_cartes,33); (* Création de cartes de test *)
@@ -45,7 +44,7 @@ begin
     t := 0; a:=0;
 
     while true do begin (* Boucle principale *)
-        afficher_background(image); (* chargement du fond *)
+        afficher_background; (* chargement du fond *)
         afficher_atout(atout); (* chargement de la couleur de l'atout *)
         afficher_joueurs(joueurs_list); (* chargement/affichage des joueurs *)
         afficher_cartes; (* chargement des cartes *)
@@ -54,16 +53,12 @@ begin
         afficher_manche; (* affichage des cartes jouées *)
         afficher_cadre(); (* affichage d'un cadre au survol d'une carte *)
 
+        saisir_txt_context;
+
         refresh(); (* mise à jour de l'image avec les données précédemment chargées *)
 
-        if a=0 then begin
-            saisir_txt_context;
-            a := 1;
-            End
-        else begin
-            saisir_txt('hey');
-            a := 0;
-        end;
+        if t>45 then
+            writeln('result :',saisir_txt('Entrez votre pari')); (* Demander une saisie *)
 
 
         while (sdl_update = 1) do begin (* si la fenêtre se met à jour (mouvement de la souris) *)
