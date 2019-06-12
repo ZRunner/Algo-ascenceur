@@ -21,13 +21,13 @@ procedure set_fps(frame_per_second:integer); // initialise le nombre d'images pa
 
 (* Convertir les données *)
 procedure convert_carte(var cart:carte); // Convertir une carte basique en une carte compatible avec la lib graphique
-function load_players(players_list:joueursArray):joueursArray; // Convertir la liste des joueurs de base en une liste utilisable par la lib graphique
+procedure load_players(var players_list:joueursArray); // Convertir la liste des joueurs de base en une liste utilisable par la lib graphique
 function convert_text(message:string): text_graph; // Convertir un texte
 function convert_couleur(couleur:byte):color_graph; // convertir une couleur byte en couleur compatible
 
 (* A appeler dans la boucle while *)
 procedure afficher_cartes; // afficher une liste de cartes, avec possibilité de réduire/augmenter la taille
-procedure afficher_joueurs(players_graph:joueursArray); // Afficher la liste des joueurs autours de la "table"
+procedure afficher_joueurs; // Afficher la liste des joueurs autours de la "table"
 procedure afficher_background(); // Affiche l'image de fond
 procedure afficher_texte(message:text_graph;couleur:color_graph); // Afficher un message
 procedure refresh; // Afficher l'image
@@ -55,6 +55,7 @@ var font_noms, font_cartes, font_msg, font_atout, font_manche :PTTF_Font; // pol
     background : gImage;
     cartes_deck : cartesArray;
     cartes_main : cartesArray;
+    liste_joueurs : joueursArray;
     joueur_actif : joueur;
     clic_actif : boolean;
     typing : boolean;
@@ -203,7 +204,7 @@ end;
 procedure afficher_carte(cart:carte;echelle:real=1);
 var x,y,w,h:real;
 begin
-    x := cart.x; y:=cart.y; w:=cart.w; h:=cart.h;
+    x := cart.x*G_SCR_W; y:=cart.y*G_SCR_H; w:=cart.w*G_SCR_W; h:=cart.h*G_SCR_H;
     gFillRect(x-w/2,y-h/2,w,h,gLib2D.WHITE);
     gDrawRect(x-w/2,y-h/2,w,h,gLib2D.BLACK);
     if echelle<2 then
@@ -232,28 +233,28 @@ begin
 end;
 
 
-procedure afficher_joueurs(players_graph:joueursArray);
+procedure afficher_joueurs();
 var i,players_nbr:integer;
 Begin
-    players_nbr := length(players_graph);
+    players_nbr := length(liste_joueurs);
     for i:=0 to players_nbr-1 do begin (* Ajout des points des joueurs *)
-        gBeginRects(players_graph[i].pseudo_txt); (* Ajout des pseudos *)
+        gBeginRects(liste_joueurs[i].pseudo_txt); (* Ajout des pseudos *)
             gSetCoordMode(G_CENTER);
-            gSetCoord(players_graph[i].x,players_graph[i].y+G_SCR_W*0.04);
+            gSetCoord(liste_joueurs[i].x,liste_joueurs[i].y+G_SCR_W*0.04);
             gSetColor(gLib2D.BLACK);
             gAdd();
         gEnd();
-    gFillCircle(players_graph[i].x,players_graph[i].y, G_SCR_W*0.025, players_graph[i].gcouleur);
+    gFillCircle(liste_joueurs[i].x,liste_joueurs[i].y, G_SCR_W*0.025, liste_joueurs[i].gcouleur);
 end;
 end;
 
 
-procedure saisir_txt_context();
+procedure saisir_txt_context(longueur:integer);
 var w,h,x,y:real;
     i:integer;
 begin
     if not typing then exit;
-    w := G_SCR_W*0.45; h := G_SCR_H*0.15;
+    w := G_SCR_W*0.02*(longueur+1); h := G_SCR_H*0.17;
     x := G_SCR_W*0.5-w/2; y := G_SCR_H*0.45-h/2;
     for i:=0 to 4 do
         gDrawRect(x-1,y-1,w+i,h+i,gLib2D.BLACK);
@@ -266,7 +267,7 @@ begin
     gEnd();
     gBeginRects(text_consigne); (* Affichage de la question *)
         gSetCoordMode(G_CENTER);
-        gSetCoord(x+w/2,(y+h/2)*0.95);
+        gSetCoord(x+w/2,(y+h/2)*0.9);
         gSetColor(gLib2D.BLACK);
         gAdd();
     gEnd();
@@ -287,7 +288,7 @@ begin
             text_displayed := gTextLoad('...',font_manche)
         else
             text_displayed := gTextLoad(text_typing,font_manche);
-        saisir_txt_context;
+        saisir_txt_context(length(message));
         refresh;
         while (sdl_update = 1) do begin
             if (sdl_do_quit) then (* Clic sur la croix pour fermer *)
@@ -315,7 +316,7 @@ end;
 
 procedure _cadre(c:carte;color:gColor);
 begin
-    gDrawRect(c.x-c.w/2-1,c.y-c.h/2-1,c.w+2,c.h+2,color);
+    gDrawRect(c.x*G_SCR_W - c.w/2*G_SCR_W - 1 , c.y*G_SCR_W - c.h/2*G_SCR_W - 1 , c.w*G_SCR_W+2 , c.h*G_SCR_W+2,color);
 end;
 
 function detect_carte(main:boolean):carte;
@@ -325,10 +326,10 @@ begin
     coo := sdl_get_mouse_xy;
     if main then
         for cart in cartes_main do
-            if (coo[0]>cart.x-cart.w/2) and (coo[0]<cart.x+cart.w/2) and (coo[1]<cart.y+cart.h/2) and (coo[1]>cart.y-cart.h/2) then
+            if (coo[0]>(cart.x-cart.w/2)*G_SCR_W) and (coo[0]<(cart.x+cart.w/2)*G_SCR_W) and (coo[1]<(cart.y+cart.h/2)*G_SCR_W) and (coo[1]>(cart.y-cart.h/2)*G_SCR_W) then
                 exit(cart);
     for cart in cartes_deck do
-        if (coo[0]>cart.x-cart.w/2) and (coo[0]<cart.x+cart.w/2) and (coo[1]<cart.y+cart.h/2) and (coo[1]>cart.y-cart.h/2) then
+        if (coo[0]>(cart.x-cart.w/2)*G_SCR_W) and (coo[0]<(cart.x+cart.w/2)*G_SCR_W) and (coo[1]<(cart.y+cart.h/2)*G_SCR_W) and (coo[1]>(cart.y-cart.h/2)*G_SCR_W) then
             exit(cart);
     detect_carte.valeur := -1;
 end;
@@ -374,10 +375,10 @@ begin
         k := i;
         while j<min(20,length(cartes)-k) do begin
             cartes_deck[i] := cartes[i];
-            cartes_deck[i].x := x;
-            cartes_deck[i].y := y;
-            cartes_deck[i].w := G_SCR_W*0.036;
-            cartes_deck[i].h := G_SCR_H*0.056;
+            cartes_deck[i].x := x/G_SCR_W;
+            cartes_deck[i].y := y/G_SCR_W;
+            cartes_deck[i].w := 0.036;
+            cartes_deck[i].h := 0.056;
             x += (G_SCR_W*0.033+interval);
             j += 1;
             i += 1;
@@ -392,6 +393,7 @@ procedure set_cartes_main(cartes:cartesArray);
 var i,interval:integer;
     x,y,w,h:real;
 begin
+    if length(cartes)=0 then exit;
     i := 0;
     while cartes[i].valeur>0 do i += 1;
     SetLength(cartes_main,i);
@@ -402,44 +404,41 @@ begin
     w := G_SCR_W*0.1; h := G_SCR_H*0.156;
     for i:=0 to high(cartes) do begin
         cartes_main[i] := cartes[i];
-        cartes_main[i].x := x;
-        cartes_main[i].y := y;
-        cartes_main[i].w := w;
-        cartes_main[i].h := h;
+        cartes_main[i].x := x/G_SCR_W;
+        cartes_main[i].y := y/G_SCR_W;
+        cartes_main[i].w := w/G_SCR_W;
+        cartes_main[i].h := h/G_SCR_W;
         x += (G_SCR_W*0.1+interval);
         end;
 end;
 
 
 
-procedure init(taille:integer);
+procedure _convert_player(var pl:joueur); (* couleur et police *)
 begin
-    gLib2D.change_size(taille,taille);
-    gClear(gLib2D.BLACK);
-    background := gTexLoad('tex.jpg'); (* Chargement de la texture *)
-    font_cartes := TTF_OpenFont('font_cards.ttf', round(G_SCR_W*0.015));
-    font_noms := TTF_OpenFont('font_names.ttf', round(G_SCR_W*0.02));
-    font_msg := TTF_OpenFont('font_names.ttf', round(G_SCR_W*0.06));
-    font_atout := TTF_OpenFont('font_cards.ttf', round(G_SCR_W*0.053));
-    font_manche := TTF_OpenFont('font_cards.ttf', round(G_SCR_W*0.028));
+    if length(pl.pseudo)=0 then exit;
+    pl.pseudo_txt := gTextLoad(pl.pseudo,font_noms);
+    pl.gcouleur := convert_couleur(pl.couleur);
 end;
 
-function load_players(players_list:joueursArray):joueursArray;
+procedure load_players(var players_list:joueursArray);
 var i, players_nbr, x, y:integer;
     theta:real;
 begin
     players_nbr := length(players_list);
     x := G_SCR_W div 2;
     y := G_SCR_H div 2;
-    SetLength(load_players,players_nbr);
+    SetLength(liste_joueurs,players_nbr);
     for i:=0 to players_nbr-1 do begin (* Initialisation des positions et des couleurs *)
         theta := 2*pi/players_nbr*i;
-        load_players[i].x := round(cos(theta)*G_SCR_W*0.44) + x;
-        load_players[i].y := round(sin(theta)*G_SCR_W*0.44) + y;
-        load_players[i].pseudo_txt := gTextLoad(players_list[i].pseudo,font_noms);
-        load_players[i].gcouleur := convert_couleur(players_list[i].couleur);
+        players_list[i].x := round(cos(theta)*G_SCR_W*0.44) + x;
+        players_list[i].y := round(sin(theta)*G_SCR_W*0.44) + y;
+        _convert_player(players_list[i]);
+        liste_joueurs[i] := players_list[i];
     end;
 end;
+
+
 
 procedure afficher_background();
 var x,y,w,h:integer;
@@ -454,6 +453,27 @@ begin
         gSetCoord(x, y);
         gAdd();
     gEnd();
+end;
+
+procedure init(taille:integer);
+var i:integer;
+begin
+    gLib2D.change_size(taille,taille);
+    background := gTexLoad('tex.jpg'); (* Chargement de la texture *)
+    font_cartes := TTF_OpenFont('font_cards.ttf', round(12.5));
+    font_noms := TTF_OpenFont('font_names.ttf', round(17));
+    font_msg := TTF_OpenFont('font_names.ttf', round(51));
+    font_atout := TTF_OpenFont('font_cards.ttf', round(45));
+    font_manche := TTF_OpenFont('font_cards.ttf', round(24));
+
+    for i:=0 to high(cartes_deck) do (* rechargement des cartes *)
+        convert_carte(cartes_deck[i]);
+    set_deck(cartes_deck);
+    for i:=0 to high(cartes_main) do
+        convert_carte(cartes_main[i]);
+    set_cartes_main(cartes_main);
+    load_players(liste_joueurs); (* rechargement des joueurs *)
+    _convert_player(joueur_actif); (* rechargement du joueur actif *)
 end;
 
  begin
