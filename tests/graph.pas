@@ -44,13 +44,13 @@ function sdl_get_mouse_xy : twarray; // Coordonnées x - y de la souris
 function sdl_get_keypressed : integer; // Si une touche du clavier est pressée, retourne sa valeur (http://www.siteduzero.com/uploads/fr/ftp/mateo21/sdlkeysym.html)
 function on_click(main:boolean=False):carte; // Retourne la carte où le joueur a cliqué
 function saisir_txt(message:string;limit:integer;int_seulement:boolean):string; // demande à l'utilisateur de saisir du texte
-
+procedure afficher_score(liste:joueursArray;temps:integer);
 
 // ---------- PRIVE ------------ //
 
 implementation
 
-var font_noms, font_cartes, font_msg, font_atout, font_manche :PTTF_Font; // polices des textes
+var font_noms, font_cartes, font_msg, font_atout, font_manche, font_score :PTTF_Font; // polices des textes
     _event : TSDL_Event;
     background : gImage;
     cartes_deck : cartesArray;
@@ -167,6 +167,51 @@ begin
         gSetColor(gLib2D.BLACK);
         gAdd();
     gEnd();
+end;
+
+procedure afficher_background();
+var x,y,w,h:integer;
+begin
+    x := G_SCR_W div 2; (* Milieu de l'écran *)
+    y := G_SCR_H div 2; (* Milieu de l'écran *)
+    w := G_SCR_W; (* Largeur de l'écran *)
+    h := G_SCR_H; (* Hauteur de l'écran *)
+    gBeginRects(background); (* Ajout de l'image de fond *)
+        gSetCoordMode(G_CENTER);
+        gSetScaleWH(w, h);
+        gSetCoord(x, y);
+        gAdd();
+    gEnd();
+end;
+
+procedure afficher_score(liste:joueursArray;temps:integer);
+var x,y,w,h:real;
+    i:integer;
+begin
+    afficher_background;
+    w := G_SCR_W*0.75; h := G_SCR_H*0.6;
+    x := G_SCR_W*0.5-w*0.5; y := G_SCR_H*0.5-h*0.6;
+    gFillRect(x,y,w,h,gLib2D.WHITE);
+    gDrawRect(x-1,y-1,w+4,h+4,gLib2D.GRAY);
+    gDrawRect(x-1,y-1,w+3,h+3,gLib2D.DARKGRAY);
+    gDrawRect(x-1,y-1,w+2,h+2,gLib2D.BLACK);
+    gBeginRects(gTextLoad('SCORES :',font_score));
+        gSetCoordMode(G_CENTER);
+        gSetCoord(G_SCR_W*0.5,G_SCR_H*0.2);
+        gSetColor(gLib2D.BLACK);
+        gAdd();
+    gEnd();
+    for i:=0 to high(liste) do begin
+        gBeginRects(gTextLoad(liste[i].pseudo+' : '+intToStr(liste[i].point),font_score));
+            gSetCoordMode(G_CENTER);
+            gSetCoord(G_SCR_W*0.5,G_SCR_H*(0.3+i*0.07));
+            gSetColor(gLib2D.BLACK);
+            gAdd();
+        gEnd();
+    end;
+    refresh;
+    sleep(temps*1000);
+gEnd();
 end;
 
 procedure afficher_atout(cart:carte);
@@ -439,22 +484,6 @@ begin
 end;
 
 
-
-procedure afficher_background();
-var x,y,w,h:integer;
-begin
-    x := G_SCR_W div 2; (* Milieu de l'écran *)
-    y := G_SCR_H div 2; (* Milieu de l'écran *)
-    w := G_SCR_W; (* Largeur de l'écran *)
-    h := G_SCR_H; (* Hauteur de l'écran *)
-    gBeginRects(background); (* Ajout de l'image de fond *)
-        gSetCoordMode(G_CENTER);
-        gSetScaleWH(w, h);
-        gSetCoord(x, y);
-        gAdd();
-    gEnd();
-end;
-
 procedure init(taille:integer);
 var i:integer;
 begin
@@ -462,9 +491,10 @@ begin
     background := gTexLoad('tex.jpg'); (* Chargement de la texture *)
     font_cartes := TTF_OpenFont('font_cards.ttf', round(12.5));
     font_noms := TTF_OpenFont('font_names.ttf', round(17));
-    font_msg := TTF_OpenFont('font_names.ttf', round(51));
+    font_msg := TTF_OpenFont('font_names.ttf', round(50));
     font_atout := TTF_OpenFont('font_cards.ttf', round(45));
-    font_manche := TTF_OpenFont('font_cards.ttf', round(24));
+    font_manche := TTF_OpenFont('font_cards.ttf', round(25));
+    font_score := TTF_OpenFont('font_names.ttf', round(40));
 
     for i:=0 to high(cartes_deck) do (* rechargement des cartes *)
         convert_carte(cartes_deck[i]);
