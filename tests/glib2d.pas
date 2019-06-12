@@ -506,7 +506,7 @@ procedure gResetScissor;
 procedure gSetScissor(x, y, w, h : integer);
 
 
-(* Procedures pour les tapettes :D
+(*
     gBlit(x, y, image, w, h);
     * Blit an image (calls Rects, gSetCoord, gSetScale, gAdd, gEnd)
 
@@ -635,11 +635,8 @@ var
 	obj_tex : gImage;
 
 
-procedure change_size(w,h:integer);
-Begin
-    G_SCR_W := w;
-    G_SCR_H := h;
-end;
+
+
 
 procedure _gInit;
 begin
@@ -670,6 +667,20 @@ begin
 	glClearDepth(65535);
 
 	init := true;
+end;
+
+procedure change_size(w,h:integer);
+Begin
+    if w=G_SCR_W then exit;
+    SDL_Quit();
+
+    gSetGlobalScale(w/850);
+    G_SCR_W := w;
+    G_SCR_H := h;
+    start := False; init := False;
+    gClear(gLib2D.BLACK);
+    G_SCR_W := 850;
+    G_SCR_H := 850;
 end;
 
 procedure _gStart;
