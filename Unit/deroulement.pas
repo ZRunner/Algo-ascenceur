@@ -30,6 +30,9 @@ Procedure Manche(var liste:joueurs;n:integer);
 Procedure Ascendant(liste:joueurs;conf:config);
 Procedure Descendant(liste:joueurs;conf:config);
 Procedure ComptageDePoint(var liste:joueurs;n:integer); 
+function creerjoueur(couleur:byte;colorname:string):joueur;
+procedure creerjoueurs(var liste:joueurs);
+Procedure Partie(var liste:joueurs; conf:config);
     
 implementation
 
@@ -60,7 +63,7 @@ begin
     Exit(False);
 end;
 
-// Initialise le jeu, en créant le paquet de cartes
+// Initialise le jeu, en créant le paquet de 52 cartes 
 function init:deck;
 var i,j:integer;
     couleur:string;
@@ -84,7 +87,7 @@ begin
     for p:=0 to high(liste) do begin
         setlength(liste[p].cartes,n);
         for i:=0 to n-1 do begin
-            liste[p].cartes[i] := d[random(52)];  //c quoi le d?
+            liste[p].cartes[i] := d[random(52)];  
             while inarray(utilises,liste[p].cartes[i]) do
                 liste[p].cartes[i] := d[random(52)];
             utilises[k] := liste[p].cartes[i];
@@ -104,8 +107,9 @@ begin
 		k:=-1;
 		While (k<0) or (k>m) do
 		begin
-			writeln('Combien de plis pensez-vous réaliser ?');
-			readln(k);
+			k:=saisir_txt('Combien de plis pensez-vous remportez ?',2,true); 
+			(* 2 : pari = nombre de 2 chiffres max 
+			* true : le joueur ne peut rentrer que des chiffres *)
 		end;
 		liste[i].pari:=k;
 		s:=s+k;
@@ -259,12 +263,22 @@ var
 	T:array of carte; 
 	choix:carte; 
 	best:integer; 
-	liste_pli:array[0..4] of classes.carte;
 begin
+	set_deck(liste[0].cartes);
+	afficher_cartes;
+	set_joueur(liste[0]);
+    focus_joueur; //affichage en haut à gauche du joueur dont c'est le tour
 	setlength(T,high(liste));
 	T[0].couleur:=ChoixCarte(liste[0]).couleur;
 	T[0].valeur:=ChoixCarte(liste[0]).valeur;
+	RetirePaquet(liste[0],choix);
+	set_cartes_main(T);
+	afficher_manche; //affichage des cartes jouées au centre
 	best:=0;
+	set_deck(liste[1].cartes);
+	afficher_cartes;
+	set_joueur(liste[1]);
+    focus_joueur;
 	For i:=1 to high(liste) do
 	begin
 		Repeat 
@@ -273,10 +287,27 @@ begin
 		Until VerifDroitDePoser(liste[i],choix,T[0]); 
 		RetirePaquet(liste[i],choix);
 		T[i]:=choix;
-		If (T[i].couleur=T[i-1].couleur) and (T[i].valeur>T[i-1].valeur) Then best:=i; 
-		//à rajouter comparaison avec l'atout
+		set_cartes_main(T);
+		afficher_manche;
+		if i<>high(liste) then
+		begin
+			set_deck(liste[i+1].cartes);
+			afficher_cartes;
+			set_joueur(liste[i+1]);
+			focus_joueur; //affichage en haut à gauche du joueur dont c'est le tour
+		end;
+		If (T[i].couleur=T[0].couleur) then
+		begin
+			If (T[i].couleur=T[best].couleur) then 
+				If (T[i].valeur>T[best].valeur) then best:=i; //si atout pas encore posé
+		end
+		Else
+		begin
+			If (T[i].couleur=T[best].couleur) then  //si atout déjà posé
+				If (T[i].valeur>T[best].valeur) then best:=i;
+		end; 
 	end;
-	Exit(best);
+	Exit(best); //voir pour un effet sur T[best]
 end;
 
 //Function retrouvant dans la liste le pseudo du gagnant.
@@ -314,9 +345,9 @@ begin
 	begin
 		writeln(liste[i].pseudo, ' : ', liste[i].point);
 	end;
-end;
+end; //à retoucher avec Arthur pour l'adapter au graphisme
 
-// n est le nombre de carte distribuer par joueur, Fonction à vérifier
+// n est le nombre de carte distribuer par joueur
 Procedure ComptageDePoint(var liste:joueurs;n:integer); 
 var i:integer; conf:config;
 begin
@@ -337,6 +368,7 @@ Procedure Manche(var liste:joueurs;n:integer); //n : nombre de cartes par joueur
 var i:integer; atout:carte; color:string;
 begin
 	atout:=InitAtout(liste,n);
+	afficher_atout(atout); (* chargement de la couleur de l'atout *)
 	color:=atout.couleur;
 	Parions(liste,n);
 	For i:=1 to n do //premier joueur = gagnant tour précédent
@@ -403,6 +435,7 @@ begin
     normvideo;
 end;
 
+//Procedure rassemblant tout pour jouer une partie
 Procedure Partie(var liste:joueurs; conf:config);
 Var
 	image:classes.background;
@@ -413,9 +446,11 @@ begin
 	setlength(liste, n);
 	creerjoueurs(liste);
 	liste:=load_players(liste);
-	//faire l'affichage global du jeu puis le déroulement avec les deux procedure et 
-	//rajouter dans les fonctions les changements de paquets dans le graphisme.
-	
+	afficher_joueurs(joueurs_list); (* chargement/affichage des joueurs *)
+	plusJeune(liste);
+	afficher_background(image); (* chargement du fond *)
+	Ascendant(liste,conf);
+	Descendant(liste,conf);	
 end;
 
 end.
