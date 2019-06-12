@@ -4,40 +4,40 @@ interface
 uses fpjson, jsonparser, Intro, graph, classes, Crt, sysutils;
 
 var d:deck;
-    liste:joueurs;
+    liste:joueursArray;
     conf:config;
-    
-Function InitJoueur():integer; 
-Procedure InitPliManche(var liste:joueurs);
+
+Function InitJoueur():integer;
+Procedure InitPliManche(var liste:joueursArray);
 function inarray(liste:array of carte;card:carte):boolean;
 function init:deck;
-procedure distribuer(var liste:joueurs;n:integer);
-Procedure Parions(var liste:joueurs;n:integer);
-Procedure plusJeune(var liste:joueurs); 
+procedure distribuer(var liste:joueursArray;n:integer);
+Procedure Parions(var liste:joueursArray;n:integer);
+Procedure plusJeune(var liste:joueursArray);
 Function RandomDeck:deck;
-Function InitAtout(liste:joueurs;n:integer):carte; 
+Function InitAtout(liste:joueursArray;n:integer):carte;
 Function NombreManche(var conf:config):integer;
 Function VerifCouleurExiste(colo:string):boolean;
 Function VerifValeurExiste(val:integer):boolean;
 Function VerifieCarteAjoueur(paquet:joueur;Choix:carte):boolean;
 Function ChoixCarte(paquet:joueur):carte;
 Function VerifDroitDePoser(paquet:joueur;choix,prems:carte):boolean;
-Function Pli(var liste:joueurs; atout:string):integer;
+Function Pli(var liste:joueursArray; atout:string):integer;
 Procedure RetirePaquet(var Jo:joueur;choix:carte);
-Procedure OrdreJoueur(var liste:joueurs;atout:string); 
-Procedure AfficheScore(liste:joueurs);
-Procedure Manche(var liste:joueurs;n:integer);
-Procedure Ascendant(liste:joueurs;conf:config);
-Procedure Descendant(liste:joueurs;conf:config);
-Procedure ComptageDePoint(var liste:joueurs;n:integer); 
+Procedure OrdreJoueur(var liste:joueursArray;atout:string);
+Procedure AfficheScore(liste:joueursArray);
+Procedure Manche(var liste:joueursArray;n:integer);
+Procedure Ascendant(liste:joueursArray;conf:config);
+Procedure Descendant(liste:joueursArray;conf:config);
+Procedure ComptageDePoint(var liste:joueursArray;n:integer);
 function creerjoueur(couleur:byte;colorname:string):joueur;
-procedure creerjoueurs(var liste:joueurs);
-Procedure Partie(var liste:joueurs; conf:config);
-    
+procedure creerjoueurs(var liste:joueursArray);
+Procedure Partie(var liste:joueursArray; conf:config);
+
 implementation
 
 //initialise le nombre de joueurs
-Function InitJoueur():integer; 
+Function InitJoueur():integer;
 var n:integer;
 begin
 	writeln('Combien de joueurs êtes-vous?');
@@ -46,7 +46,7 @@ begin
 end;
 
 //remise à zéro du nombre de pli réalisé par joueur par manche
-Procedure InitPliManche(var liste:joueurs);
+Procedure InitPliManche(var liste:joueursArray);
 var i:integer;
 begin
 	For i:=0 to high(liste) do
@@ -63,7 +63,7 @@ begin
     Exit(False);
 end;
 
-// Initialise le jeu, en créant le paquet de 52 cartes 
+// Initialise le jeu, en créant le paquet de 52 cartes
 function init:deck;
 var i,j:integer;
     couleur:string;
@@ -79,7 +79,7 @@ begin
 end;
 
 //distribue les cartes par joueurs
-procedure distribuer(var liste:joueurs;n:integer);
+procedure distribuer(var liste:joueursArray;n:integer);
 var i,k,p:integer;
     utilises:deck;
 begin
@@ -87,7 +87,7 @@ begin
     for p:=0 to high(liste) do begin
         setlength(liste[p].cartes,n);
         for i:=0 to n-1 do begin
-            liste[p].cartes[i] := d[random(52)];  
+            liste[p].cartes[i] := d[random(52)];
             while inarray(utilises,liste[p].cartes[i]) do
                 liste[p].cartes[i] := d[random(52)];
             utilises[k] := liste[p].cartes[i];
@@ -97,7 +97,7 @@ begin
 end;
 
 //enregistrement des paris
-Procedure Parions(var liste:joueurs;n:integer);
+Procedure Parions(var liste:joueursArray;n:integer);
 var i,k,s,m:integer;
 begin
 	s:=0;
@@ -107,8 +107,8 @@ begin
 		k:=-1;
 		While (k<0) or (k>m) do
 		begin
-			k:=saisir_txt('Combien de plis pensez-vous remportez ?',2,true); 
-			(* 2 : pari = nombre de 2 chiffres max 
+			k:=saisir_txt('Combien de plis pensez-vous remportez ?',2,true);
+			(* 2 : pari = nombre de 2 chiffres max
 			* true : le joueur ne peut rentrer que des chiffres *)
 		end;
 		liste[i].pari:=k;
@@ -118,8 +118,8 @@ begin
 end;
 
 //changer la liste avec le premier joueur premier liste au début de la partie
-Procedure plusJeune(var liste:joueurs); 
-var i,j,x:integer; T:joueurs;
+Procedure plusJeune(var liste:joueursArray);
+var i,j,x:integer; T:joueursArray;
 begin
 	setlength(T,high(liste)+1);
 	T[0]:=liste[0];
@@ -138,14 +138,14 @@ begin
 		j:=j+1;
 		if j=high(liste) then j:=0
 	end;
-end; 
+end;
 
 Function RandomDeck:deck;
 var p:deck; i,k:integer; utilises:deck;
 Begin
  k := 0;
         for i:=0 to 51 do begin
-            p[i] := d[random(52)];         
+            p[i] := d[random(52)];
             while inarray(utilises,p[i]) do
                 p[i] := d[random(52)];
             utilises[k] := p[i];
@@ -155,7 +155,7 @@ Begin
 end;
 
 // n = nbr de cartes par joueur et p = nombre de players
-Function InitAtout(liste:joueurs;n:integer):carte; 
+Function InitAtout(liste:joueursArray;n:integer):carte;
 var d:deck;
 p:integer;
 j,i:integer;
@@ -182,11 +182,11 @@ Function NombreManche(var conf:config):integer;
 begin
 conf.players:=InitJoueur();
 NombreManche:=round(52/conf.players);
-If (conf.players=2) or (conf.players=4) then 
+If (conf.players=2) or (conf.players=4) then
 NombreManche:=NombreManche-1;
 end;
 
-//Fonction pour vérifier si la couleur choisi par le joueur sur le terminal existe 
+//Fonction pour vérifier si la couleur choisi par le joueur sur le terminal existe
 Function VerifCouleurExiste(colo:string):boolean;
 begin
 	If (colo='trefle') Then VerifCouleurExiste:=true
@@ -218,7 +218,7 @@ end;
 Function ChoixCarte(paquet:joueur):carte;
 begin
 	Repeat
-		Repeat 
+		Repeat
 			writeln('Couleur de la carte que vous voulez jouer :');
 			readln(ChoixCarte.couleur);
 		Until VerifCouleurExiste(ChoixCarte.couleur); //vérifier couleur choisie existe
@@ -251,18 +251,18 @@ begin
 	j:=0;
 	For i:=0 to high(G) do
 	begin
-		If (Jo.cartes[j].couleur<>choix.couleur) or (Jo.cartes[j].valeur<>choix.valeur) then G[i]:=Jo.cartes[j]; 
+		If (Jo.cartes[j].couleur<>choix.couleur) or (Jo.cartes[j].valeur<>choix.valeur) then G[i]:=Jo.cartes[j];
 		j:=j+1;
 	end;
 end;
 
 //pour un tour, renvoit un entier qui est le numéro du gagnant dans la liste actuelle
-Function Pli(var liste:joueurs; atout:string):integer;
-var 
-	i:integer; 
-	T:array of carte; 
-	choix:carte; 
-	best:integer; 
+Function Pli(var liste:joueursArray; atout:string):integer;
+var
+	i:integer;
+	T:array of carte;
+	choix:carte;
+	best:integer;
 begin
 	set_deck(liste[0].cartes);
 	afficher_cartes;
@@ -281,10 +281,10 @@ begin
     focus_joueur;
 	For i:=1 to high(liste) do
 	begin
-		Repeat 
-			choix.couleur:=ChoixCarte(liste[i]).couleur; //choix est dans le paquet du joueur	
+		Repeat
+			choix.couleur:=ChoixCarte(liste[i]).couleur; //choix est dans le paquet du joueur
 			choix.valeur:=ChoixCarte(liste[i]).valeur;
-		Until VerifDroitDePoser(liste[i],choix,T[0]); 
+		Until VerifDroitDePoser(liste[i],choix,T[0]);
 		RetirePaquet(liste[i],choix);
 		T[i]:=choix;
 		set_cartes_main(T);
@@ -298,31 +298,31 @@ begin
 		end;
 		If (T[i].couleur=T[0].couleur) then
 		begin
-			If (T[i].couleur=T[best].couleur) then 
+			If (T[i].couleur=T[best].couleur) then
 				If (T[i].valeur>T[best].valeur) then best:=i; //si atout pas encore posé
 		end
 		Else
 		begin
 			If (T[i].couleur=T[best].couleur) then  //si atout déjà posé
 				If (T[i].valeur>T[best].valeur) then best:=i;
-		end; 
+		end;
 	end;
 	Exit(best); //voir pour un effet sur T[best]
 end;
 
 //Function retrouvant dans la liste le pseudo du gagnant.
-Function RecherchePseudoGagnant(liste:joueurs;atout:string):joueur; 
+Function RecherchePseudoGagnant(liste:joueursArray;atout:string):joueur;
 var i: integer;
 begin
-For i:=1 to high(liste) do 
+For i:=1 to high(liste) do
 	If Pli(liste,atout)= i then
 	Exit(liste[i]);
 end;
 
-// Procédure permettant d'afficher l'ordre des joueurs pour le pli suivant. 
-Procedure OrdreJoueur(var liste:joueurs;atout:string); 
+// Procédure permettant d'afficher l'ordre des joueurs pour le pli suivant.
+Procedure OrdreJoueur(var liste:joueursArray;atout:string);
 var i,j,x:integer;
-T:joueurs;
+T:joueursArray;
 begin
 	setlength(T,high(liste)+1);
 	T[0]:=RecherchePseudoGagnant(liste,atout);
@@ -338,7 +338,7 @@ begin
 end;
 
 //pour afficher les scores en chaque fin de manche
-Procedure AfficheScore(liste:joueurs);
+Procedure AfficheScore(liste:joueursArray);
 Var i:integer;
 begin
 	For i:=0 to high(liste) do
@@ -348,7 +348,7 @@ begin
 end; //à retoucher avec Arthur pour l'adapter au graphisme
 
 // n est le nombre de carte distribuer par joueur
-Procedure ComptageDePoint(var liste:joueurs;n:integer); 
+Procedure ComptageDePoint(var liste:joueursArray;n:integer);
 var i:integer; conf:config;
 begin
 conf.win_defaut:=10;
@@ -364,7 +364,7 @@ end;
 end;
 
 //pour une manche
-Procedure Manche(var liste:joueurs;n:integer); //n : nombre de cartes par joueur au début de la manche
+Procedure Manche(var liste:joueursArray;n:integer); //n : nombre de cartes par joueur au début de la manche
 var i:integer; atout:carte; color:string;
 begin
 	atout:=InitAtout(liste,n);
@@ -381,7 +381,7 @@ begin
 end;
 
 //la phase ascendante
-Procedure Ascendant(liste:joueurs;conf:config);
+Procedure Ascendant(liste:joueursArray;conf:config);
 var i,x:integer;
 begin
 	x:=NombreManche(conf);
@@ -390,12 +390,12 @@ begin
 		distribuer(liste,i);
 		Manche(liste,i);
 	end;
-		
+
 end;
 
 //la phase descendante
-Procedure Descendant(liste:joueurs;conf:config);
-var i,x:integer; 
+Procedure Descendant(liste:joueursArray;conf:config);
+var i,x:integer;
 begin
 	x:=NombreManche(conf);
 	For i:=x downto 1 do
@@ -425,7 +425,7 @@ begin
 end;
 
 // Création de la liste de tous les joueurs
-procedure creerjoueurs(var liste:joueurs);
+procedure creerjoueurs(var liste:joueursArray);
 var i:integer;
     cls:array[0..6] of byte=(red,yellow,blue,green,Magenta,Brown,LightGray);
     clsn:array[0..6] of string=('Rouge','Jaune','Bleu','Vert','Violet','Marron','Blanc');
@@ -436,7 +436,7 @@ begin
 end;
 
 //Procedure rassemblant tout pour jouer une partie
-Procedure Partie(var liste:joueurs; conf:config);
+Procedure Partie(var liste:joueursArray; conf:config);
 Var
 	image:classes.background;
 	liste_cartes:cartes;
@@ -450,7 +450,7 @@ begin
 	plusJeune(liste);
 	afficher_background(image); (* chargement du fond *)
 	Ascendant(liste,conf);
-	Descendant(liste,conf);	
+	Descendant(liste,conf);
 end;
 
 end.
