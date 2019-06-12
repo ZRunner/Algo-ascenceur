@@ -16,14 +16,19 @@ begin
     SetLength(joueurs_list,5); (* Création de la liste des joueurs *)
     joueurs_list[0].pseudo := 'Z_runner';
     joueurs_list[0].couleur := red;
+    joueurs_list[0].point := round(random(30));
     joueurs_list[1].pseudo := 'MelyMelo8';
     joueurs_list[1].couleur := YELLOW;
+    joueurs_list[1].point := round(random(30));
     joueurs_list[2].pseudo := 'Moustique';
     joueurs_list[2].couleur := blue;
+    joueurs_list[2].point := round(random(30));
     joueurs_list[3].pseudo := 'Awhikax';
     joueurs_list[3].couleur := green;
+    joueurs_list[3].point := round(random(30));
     joueurs_list[4].pseudo := 'loann';
     joueurs_list[4].couleur := magenta;
+    joueurs_list[4].point := round(random(30));
     text := convert_text('Welcome!');
     SetLength(liste_cartes,33); (* Création de cartes de test *)
     for i:=0 to high(liste_cartes) do begin
@@ -45,6 +50,7 @@ begin
 
     t := 0;
 
+
     while true do begin (* Boucle principale *)
         afficher_background; (* chargement du fond *)
         afficher_atout(atout); (* chargement de la couleur de l'atout *)
@@ -58,10 +64,12 @@ begin
         refresh(); (* mise à jour de l'image avec les données précédemment chargées *)
 
         if t>99 then begin
-            input := saisir_txt('Entrez la nouvelle largeur d''ecran',3,true); (* texte à afficher, longueur max, chiffre seulement *)
-            init(StrToInt(input)); (* changement de la taille d'écran *)
-            load_players(joueurs_list); (* rechargement de la police à cause du changement de taille*)
-            text := convert_text('Welcome!'); (* idem *)
+            //input := saisir_txt('Entrez la nouvelle largeur d''ecran',3,true); (* texte à afficher, longueur max, chiffre seulement *)
+            //init(StrToInt(input)); (* changement de la taille d'écran *)
+            //load_players(joueurs_list); (* rechargement de la police à cause du changement de taille*)
+            //text := convert_text('Welcome!'); (* idem *)
+
+            afficher_score(joueurs_list,7);
             end;
 
 
