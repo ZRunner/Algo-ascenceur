@@ -12,43 +12,38 @@ uses gLib2D, SDL, SDL_Image, SDL_TTF, Crt, sysutils, math, classes;
 type twarray = array[0..1] of integer;
 
 (* Initialisation *)
-function init(taille:integer):gImage; // initialiser la fenêtre, et créer la référence de l'image de fond (/!\ à appeler en premier)
-procedure set_deck(cartes:cartesArray);
-procedure set_cartes_main(cartes:cartesArray);
-procedure set_joueur(player:joueur);
+procedure init(taille:integer); // initialiser la fenêtre, et créer la référence de l'image de fond (/!\ à appeler en premier)
+procedure set_deck(cartes:cartesArray); // cartes affichées en petit en bas
+procedure set_cartes_main(cartes:cartesArray); // cartes qui seront affichées en grand au milieu
+procedure set_joueur(player:joueur); // le joueur en focus (par exemple celui en train de jouer)
+procedure set_fps(frame_per_second:integer); // initialise le nombre d'images par seconde
 
 
 (* Convertir les données *)
 procedure convert_carte(var cart:carte); // Convertir une carte basique en une carte compatible avec la lib graphique
 function load_players(players_list:joueursArray):joueursArray; // Convertir la liste des joueurs de base en une liste utilisable par la lib graphique
 function convert_text(message:string): text_graph; // Convertir un texte
-function convert_couleur(couleur:byte):color_graph;
+function convert_couleur(couleur:byte):color_graph; // convertir une couleur byte en couleur compatible
 
 (* A appeler dans la boucle while *)
 procedure afficher_cartes; // afficher une liste de cartes, avec possibilité de réduire/augmenter la taille
 procedure afficher_joueurs(players_graph:joueursArray); // Afficher la liste des joueurs autours de la "table"
-procedure afficher_background(image:gImage); // Affiche l'image de fond
+procedure afficher_background(); // Affiche l'image de fond
 procedure afficher_texte(message:text_graph;couleur:color_graph); // Afficher un message
 procedure refresh; // Afficher l'image
 procedure focus_joueur; // Affiche le pseudo d'un joueur en haut à gauche de l'écran
 procedure afficher_atout(cart:carte); // Affiche la couleur de l'atout actuel
 procedure afficher_manche; // Affiche la liste des cartes jouées
-procedure afficher_cadre;
+procedure afficher_cadre; // affiche le cadre autours de la carte survolée par la souris
 
 
-(* Partie SDL *)
+(* Partie interractivité *)
 function sdl_update : integer; // Retourne 1 lorsque quelque chose bouge sur l'écran (clic etc)
 function sdl_do_quit : boolean; // Si l'utilisateur ferme la fenêtre
 function sdl_get_mouse_xy : twarray; // Coordonnées x - y de la souris
-function sdl_get_mouse_y : Uint16;
-function sdl_mouse_left_up : boolean; // Si le joueur presse le bouton gauche de la souris
-function sdl_mouse_left_down : boolean; // Si le joueur relâche le bouton gauche
-function sdl_mouse_right_up : boolean;
-function sdl_mouse_right_down : boolean;
 function sdl_get_keypressed : integer; // Si une touche du clavier est pressée, retourne sa valeur (http://www.siteduzero.com/uploads/fr/ftp/mateo21/sdlkeysym.html)
 function on_click(main:boolean=False):carte; // Retourne la carte où le joueur a cliqué
-function saisir_txt(message:string;limit:integer=15):string;
-procedure saisir_txt_context();
+function saisir_txt(message:string;limit:integer;int_seulement:boolean):string; // demande à l'utilisateur de saisir du texte
 
 
 // ---------- PRIVE ------------ //
@@ -57,14 +52,26 @@ implementation
 
 var font_noms, font_cartes, font_msg, font_atout, font_manche :PTTF_Font; // polices des textes
     _event : TSDL_Event;
+    background : gImage;
     cartes_deck : cartesArray;
     cartes_main : cartesArray;
     joueur_actif : joueur;
     clic_actif : boolean;
+    typing : boolean;
+    text_typing : string;
+    text_displayed : gImage;
+    text_consigne : gImage;
+    fps : integer;
 
 procedure refresh;
 begin
-    gFlip
+    gFlip;
+    sleep(fps);
+end;
+
+procedure set_fps(frame_per_second:integer);
+begin
+    fps := round(1/frame_per_second*1000);
 end;
 
 function sdl_update : integer;
@@ -77,40 +84,10 @@ begin
     exit(_event.type_ = SDL_QUITEV);
 end;
 
-
 function sdl_get_mouse_xy : twarray;
 begin
     sdl_get_mouse_xy[0] := _event.motion.x;
     sdl_get_mouse_xy[1] := _event.motion.y;
-end;
-
-function sdl_get_mouse_y : Uint16;
-begin
-    exit(_event.motion.y);
-end;
-
-function sdl_mouse_left_up : boolean;
-begin
-    exit((_event.type_ = SDL_MOUSEBUTTONUP)
-    and  (_event.button.button = SDL_BUTTON_LEFT));
-end;
-
-function sdl_mouse_left_down : boolean;
-begin
-    exit((_event.type_ = SDL_MOUSEBUTTONDOWN)
-    and  (_event.button.button = SDL_BUTTON_LEFT));
-end;
-
-function sdl_mouse_right_up : boolean;
-begin
-    exit((_event.type_ = SDL_MOUSEBUTTONUP)
-    and  (_event.button.button = SDL_BUTTON_RIGHT));
-end;
-
-function sdl_mouse_right_down : boolean;
-begin
-    exit((_event.type_ = SDL_MOUSEBUTTONDOWN)
-    and  (_event.button.button = SDL_BUTTON_RIGHT));
 end;
 
 function sdl_get_keypressed : integer;
@@ -270,44 +247,67 @@ Begin
 end;
 end;
 
+
 procedure saisir_txt_context();
-var w,h:real;
+var w,h,x,y:real;
+    i:integer;
 begin
-    w := G_SCR_W*0.15; h := G_SCR_H*0.1;
-    gFillRect(G_SCR_W/2-w/2,G_SCR_H/2-h/2,w,h,gLib2D.WHITE);
-    refresh;
+    if not typing then exit;
+    w := G_SCR_W*0.45; h := G_SCR_H*0.15;
+    x := G_SCR_W*0.5-w/2; y := G_SCR_H*0.45-h/2;
+    for i:=0 to 4 do
+        gDrawRect(x-1,y-1,w+i,h+i,gLib2D.BLACK);
+    gFillRect(x,y,w,h,gLib2D.WHITE);
+    gBeginRects(text_displayed); (* Affichage de la réponse *)
+        gSetCoordMode(G_CENTER);
+        gSetCoord(x+w/2,(y+h/2)*1.07);
+        gSetColor(gLib2D.BLACK);
+        gAdd();
+    gEnd();
+    gBeginRects(text_consigne); (* Affichage de la question *)
+        gSetCoordMode(G_CENTER);
+        gSetCoord(x+w/2,(y+h/2)*0.95);
+        gSetColor(gLib2D.BLACK);
+        gAdd();
+    gEnd();
 end;
 
-function saisir_txt(message:string;limit:integer=15):string;
+function saisir_txt(message:string;limit:integer;int_seulement:boolean):string;
 var i:integer;
     c:char;
-    w,h:real;
 begin
-    saisir_txt := '';
+    typing := True;
     i := -1;
+    text_consigne := gTextLoad(message,font_manche);
 
-
-    while (length(saisir_txt)<limit) and (i<>13) do begin
-        //
+    while (i<>13) do begin
+        afficher_background;
+        focus_joueur;
+        if length(text_typing)=0 then
+            text_displayed := gTextLoad('...',font_manche)
+        else
+            text_displayed := gTextLoad(text_typing,font_manche);
+        saisir_txt_context;
+        refresh;
         while (sdl_update = 1) do begin
             if (sdl_do_quit) then (* Clic sur la croix pour fermer *)
                 halt;
             i := sdl_get_keypressed;
+            if (length(text_typing)>=limit) then continue;
             if i<>-1 then
                 c := chr(i)
             else continue;
-            if c='0' then writeln('shift')
-            else if (i>255) and (i<266) then begin
-                writeln('int ',intToStr(i-256));
-                saisir_txt += intToStr(i-256);
-            end
-            else begin
-                writeln(i,' ',c);
-                saisir_txt += c;
-            end;
+            if c='0' then
+                continue
+            else if (i>255) and (i<266) then
+                text_typing += intToStr(i-256)
+            else if not int_seulement then
+                text_typing += c;
         end;
+        sleep(10);
     end;
-    writeln('result: ',saisir_txt);
+    saisir_txt := copy(text_typing,1,limit);
+    text_typing := '';
 end;
 
 
@@ -412,11 +412,11 @@ end;
 
 
 
-function init(taille:integer):gImage;
+procedure init(taille:integer);
 begin
     gLib2D.change_size(taille,taille);
     gClear(gLib2D.BLACK);
-    init := gTexLoad('tex.jpg'); (* Chargement de la texture *)
+    background := gTexLoad('tex.jpg'); (* Chargement de la texture *)
     font_cartes := TTF_OpenFont('font_cards.ttf', round(G_SCR_W*0.015));
     font_noms := TTF_OpenFont('font_names.ttf', round(G_SCR_W*0.02));
     font_msg := TTF_OpenFont('font_names.ttf', round(G_SCR_W*0.06));
@@ -441,14 +441,14 @@ begin
     end;
 end;
 
-procedure afficher_background(image:gImage);
+procedure afficher_background();
 var x,y,w,h:integer;
 begin
     x := G_SCR_W div 2; (* Milieu de l'écran *)
     y := G_SCR_H div 2; (* Milieu de l'écran *)
     w := G_SCR_W; (* Largeur de l'écran *)
     h := G_SCR_H; (* Hauteur de l'écran *)
-    gBeginRects(image); (* Ajout de l'image de fond *)
+    gBeginRects(background); (* Ajout de l'image de fond *)
         gSetCoordMode(G_CENTER);
         gSetScaleWH(w, h);
         gSetCoord(x, y);
