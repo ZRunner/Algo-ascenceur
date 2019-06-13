@@ -1,10 +1,10 @@
 program Projet;
 
-uses fpjson, jsonparser, Intro, Crt, sysutils, classes;
+uses loadconfig, Intro, Crt, sysutils, classes;
 
 
 var d:deck;
-    liste:joueurs;
+    liste:joueursArray;
     conf:config;
 
 // Vérifie si une carte se trouve dans une liste de cartes
@@ -37,51 +37,17 @@ begin
     writeln(a)
 end;
 
-
-// Lecture d'un fichier (celui de config)
-function loadfile(nom:string):unicodestring;
-var fic:text;
-    ligne:unicodestring;
-begin
-    ligne := '';
-    loadfile := '';
-    { $i- }
-    assign(fic,nom);
-    reset(fic);
-    if IOResult<>0 then Exit('');
-    repeat
-        readln(fic,ligne);
-        ligne := Trim(ligne);
-        loadfile := loadfile+ligne;
-    until eof(fic);
-    close(fic);
-end;
-
-// Chargement de la configuration du jeu
-function loadconfig:config;
-var jData:TJSONData;
-    jObject : TJSONObject;
-begin
-    jData := GetJSON(loadfile('config.json'));
-    jObject := TJSONObject(jData);
-    loadconfig.players := jObject.Get('max_players');
-    loadconfig.win_defaut := jObject.Get('win_default');
-    loadconfig.win := jObject.Get('win');
-    loadconfig.loose := jObject.Get('loose');
-    loadconfig.min_age := jObject.Get('min_age');
-    loadconfig.max_age := jObject.Get('max_age');
-    loadconfig.default_window_size := jObject.Get('default_window');
-end;
-
 // Création d'un joueur, avec son pseudo, sa couleur et son age
 function creerjoueur(couleur:byte;colorname:string):joueur;
 var age:integer;pseudo:string;ok:boolean;
 begin
+    writeln(conf.min_age,' ',conf.max_age);
     textcolor(couleur);
     creerjoueur.couleur := couleur;
     write('Joueur ',colorname,', indiquez votre pseudo',#10,'> ');readln(pseudo);
     {$I-}   {compiler directive, removes abort on IO error}
     write('Indiquez votre âge',#10,'> ');readln(age);
+
     while (conf.min_age>age) or (age>conf.max_age) or (IOResult <> 0) do begin
         ok := IOResult=0;
         write('Indiquez votre âge',#10,'> ');readln(age);
@@ -93,7 +59,7 @@ begin
 end;
 
 // Création de la liste de tous les joueurs
-procedure creerjoueurs(var liste:joueurs);
+procedure creerjoueurs(var liste:joueursArray);
 var i:integer;
     cls:array[0..6] of byte=(red,yellow,blue,green,Magenta,Brown,LightGray);
     clsn:array[0..6] of string=('Rouge','Jaune','Bleu','Vert','Violet','Marron','Blanc');
@@ -105,7 +71,7 @@ end;
 
 
 // Distribue un certain nombre de cartes aux joueurs, selon le deck de base
-procedure distribuer(var liste:joueurs;n:integer);
+procedure distribuer(var liste:joueursArray;n:integer);
 var i,k,p:integer;
     utilises:deck;
 begin
@@ -123,7 +89,7 @@ begin
 end;
 
 // Fonction globale de la partie, qui va appeller toutes les autres
-procedure partie(liste:joueurs);
+procedure partie(liste:joueursArray);
 var c:carte;
 begin
     distribuer(liste,5);
@@ -134,7 +100,7 @@ end;
 begin
     randomize;
     d := init;
-    conf := loadconfig;
+    conf := loadconfig.loadconfig('config.txt');
     setlength(liste,conf.players);
     creerjoueurs(liste);
     partie(liste);
