@@ -44,7 +44,7 @@ function sdl_get_mouse_xy : twarray; // Coordonnées x - y de la souris
 function sdl_get_keypressed : integer; // Si une touche du clavier est pressée, retourne sa valeur (http://www.siteduzero.com/uploads/fr/ftp/mateo21/sdlkeysym.html)
 function on_click(main:boolean=False):carte; // Retourne la carte où le joueur a cliqué
 function saisir_txt(message:string;limit:integer;int_seulement:boolean):string; // demande à l'utilisateur de saisir du texte
-procedure afficher_score(liste:joueursArray;temps:integer);
+procedure afficher_score(liste:joueursArray;temps:integer); // Affiche les scores des joueurs pendant X secondes
 
 // ---------- PRIVE ------------ //
 
