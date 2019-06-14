@@ -45,7 +45,7 @@ begin
 	liste[i].pari:=random(m+2);
 	s:=s+k;
 	m:=m-s;
-end;
+    end;
 end;
 
 Function ChoixCarte(paquet:joueur):carte;
@@ -57,7 +57,7 @@ begin
 		Until VerifCouleurExiste(ChoixCarte.couleur); //vérifier couleur choisie existe
 		Repeat
 			writeln('Valeur de cette dernière');
-			ChoixCarte.couleur:=random(carte.valeur); 
+			ChoixCarte.couleur:=random(carte.valeur);
 		Until VerifValeurExiste(p); //vérifier que la carte est bien entre 1 et roi (13)
 	Until VerifieCarteAjoueur(paquet,ChoixCarte); //vérifie que la carte peut être jouer par le joueur
 end;
@@ -78,20 +78,23 @@ begin
 end;
 
 Function ChoixCarteCouleurBot(packet:joueur;prems:carte):carte;
-var i:integer;
+var i,j:integer;
+	T:array of carte;
 begin
-	T:=tab
 	randomize;
-	Setlength(T,high(packet.cartes)
-	If carte.couleur:=prems.couleur then
-		For i:=0 to high(packet.cartes) do
-			T[i]:=carte;
-		ChoixCarteCouleurBot:=random(T[i]);
-	Repeat Until ChoixCarteCouleurBot=carte;
+	Setlength(T,high(packet.cartes));
+    j := 0;
+	For i:=0 to high(packet.cartes) do
+        If carte.couleur:=prems.couleur then begin
+			T[j]:=carte;
+            j += 1;
+            end;
+    Setlength(T,j);
+	ChoixCarteCouleurBot:=T[round(random(length(T)))];
 end;
 
 Procedure RetirePaquet(var Jo:joueur;choix:carte);
-var	i,j:integer; G:array of carte;
+var i,j:integer; G:array of carte;
 begin
 	setlength(G,length(Jo.cartes)-1);
 	j:=0;
@@ -99,7 +102,7 @@ begin
 	begin
 		If (Jo.cartes[j].couleur<>choix.couleur) or (Jo.cartes[j].valeur<>choix.valeur) then G[i]:=Jo.cartes[j];
 		j:=j+1;
-	end;	
+	end;
 end;
 
 //pour un tour, renvoit un entier qui est le numéro du gagnant dans la liste actuelle
