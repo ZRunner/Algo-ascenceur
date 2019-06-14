@@ -2,29 +2,29 @@ UNIT Bot;
 
 interface
 
-USES fpjson, jsonparser, Intro, graph, classes, Crt, sysutils, deroulement;
+USES Intro, graph, classes, Crt, sysutils, deroulement;
 
 implementation
 
 CONST pseudos : array[0..3] of string = ('Panda','Couscous','Manhattan','Cyan','Axolotl');
 
 Function CreerBot():joueur;
-Var
 begin
-randomize;
-creerBot.pseudo := pseudos[round(random(5))];
-creerBot.age:=random(80)+8;
+	randomize;
+	creerBot.pseudo := pseudos[round(random(5))];
+	creerBot.age:=random(80)+8;
 end;
 
 Procedure PartieBot();
-var
+var n:integer;
+	p:joueur;
 begin
-n:=InitJoueur();
-Writeln('Combien voulez-vous de Bot?');
-Readln(n)
-For i:=1 to n do
-p:=CreerBot();
-Partie();
+	n:=InitJoueur();
+	Writeln('Combien voulez-vous de Bot?');
+	Readln(n)
+	For i:=1 to n do
+		p:=CreerBot();
+	Partie();
 end;
 
 Procedure ParionsBot(var liste:joueursArray;n:integer);
@@ -66,8 +66,7 @@ Function VerifDroitDePoser(paquet:joueur;choix,prems:carte):boolean;
 var i:integer;
 begin
 	If (choix.couleur=prems.couleur) Then
-	VerifDroitDePoser:=true;
-	
+		VerifDroitDePoser:=true
 	Else
 	begin
 		VerifDroitDePoser:=true; //initialisation
@@ -81,20 +80,18 @@ end;
 Function ChoixCarteCouleurBot(packet:joueur;prems:carte):carte;
 var i:integer;
 begin
-T:=tab
-randomize;
-Setlength(T,high(packet.cartes)
-If carte.couleur:=prems.couleur then
-	For i:=0 to high(packet.cartes) do
-		T[i]:=carte;
-	ChoixCarteCouleurBot:=random(T[i]);
-Repeat Until ChoixCarteCouleurBot=carte;
+	T:=tab
+	randomize;
+	Setlength(T,high(packet.cartes)
+	If carte.couleur:=prems.couleur then
+		For i:=0 to high(packet.cartes) do
+			T[i]:=carte;
+		ChoixCarteCouleurBot:=random(T[i]);
+	Repeat Until ChoixCarteCouleurBot=carte;
 end;
 
 Procedure RetirePaquet(var Jo:joueur;choix:carte);
-
 var	i,j:integer; G:array of carte;
-
 begin
 	setlength(G,length(Jo.cartes)-1);
 	j:=0;
@@ -163,9 +160,9 @@ end;
 Function RecherchePseudoGagnant(liste:joueursArray;atout:string):joueur;
 var i: integer;
 begin
-For i:=1 to high(liste) do
-	If Pli(liste,atout)= i then
-	Exit(liste[i]);
+	For i:=1 to high(liste) do
+		If Pli(liste,atout)= i then
+			Exit(liste[i]);
 end;
 
 // Procédure permettant d'afficher l'ordre des joueurs pour le pli suivant.
@@ -190,25 +187,22 @@ end;
 Procedure AfficheScore(liste:joueursArray);
 Var i:integer;
 begin
-	For i:=0 to high(liste) do
-	begin
-		writeln(liste[i].pseudo, ' : ', liste[i].point);
-	end;
-end; //à retoucher avec Arthur pour l'adapter au graphisme
+	graph.afficher_score(liste,20); // 20 : nombre de secondes d'affichage
+end;
 
 // n est le nombre de carte distribuer par joueur
 Procedure ComptageDePoint(var liste:joueursArray;n:integer);
 var i:integer; conf:config;
 begin
-conf.win_defaut:=10;
-conf.win:=2;
-for i:=0 to high(liste) do
-begin
-    If  liste[i].pari = liste[i].PliManche then
-        liste[i].point := liste[i].point + 10 + conf.win*liste[i].pari
-    Else
-        liste[i].point := liste[i].point + 10-Abs(liste[i].pari-liste[i].PliManche)*conf.win;
-end;
+	conf.win_defaut:=10;
+	conf.win:=2;
+	for i:=0 to high(liste) do
+	begin
+    	If  liste[i].pari = liste[i].PliManche then
+        	liste[i].point := liste[i].point + 10 + conf.win*liste[i].pari
+    	Else
+        	liste[i].point := liste[i].point + 10-Abs(liste[i].pari-liste[i].PliManche)*conf.win;
+	end;
 	InitPliManche(liste);
 end;
 
@@ -253,4 +247,6 @@ begin
 		Manche(liste,i);
 	end;
 end;
+
+
 END.
