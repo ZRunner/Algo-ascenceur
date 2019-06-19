@@ -36,7 +36,7 @@ begin
             une_carte.couleur := 'carreau'
         else
             une_carte.couleur := 'pique';
-        une_carte.valeur := round(random*10)+1;
+        une_carte.valeur := round(random*13)+1;
         liste_cartes[i] := une_carte;
         convert_carte(liste_cartes[i]);
         if i<3 then liste_manche[i] := liste_cartes[i];
@@ -64,14 +64,14 @@ begin
         refresh(); (* mise à jour de l'image avec les données précédemment chargées *)
 
         if t>99 then begin
-            //input := saisir_txt('Entrez la nouvelle largeur d''ecran',3,true); (* texte à afficher, longueur max, chiffre seulement *)
-            //init(StrToInt(input)); (* changement de la taille d'écran *)
-            //load_players(joueurs_list); (* rechargement de la police à cause du changement de taille*)
-            //text := convert_text('Welcome!'); (* idem *)
+            input := saisir_txt('Entrez la nouvelle largeur d''ecran',3,true); (* texte à afficher, longueur max, chiffre seulement *)
+            init(StrToInt(input)); (* changement de la taille d'écran *)
+            load_players(joueurs_list); (* rechargement de la police à cause du changement de taille*)
+            text := convert_text('Welcome!'); (* idem *)
 
-            afficher_score(joueurs_list,7);
+            //afficher_score(joueurs_list,7);
             end;
-
+        
 
         while (sdl_update = 1) do begin (* si la fenêtre se met à jour (mouvement de la souris) *)
             if (sdl_do_quit) then (* Clic sur la croix pour fermer *)
