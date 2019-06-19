@@ -100,6 +100,16 @@ begin
 end;
 
 
+function convert_valeur(valeur:integer):string;
+Begin
+    if valeur<11 then Exit(IntToStr(valeur));
+    Case valeur of
+        11: convert_valeur := 'V';
+        12: convert_valeur := 'Q';
+        13: convert_valeur := 'K';
+        14: convert_valeur := 'A';
+    end;
+end;
 
 procedure convert_carte(var cart:carte);
 var couleur:string;
@@ -118,12 +128,14 @@ begin
     else
         couleur := 'Z';
     end;
-    cart.texte_petit := gTextLoad(couleur+inttostr(cart.valeur),font_cartes);
-    cart.texte_grand := gTextLoad(couleur+inttostr(cart.valeur),font_manche);
     if (couleur='[') or (couleur='{') then
         cart.gcouleur := gLib2D.RED
     else
         cart.gcouleur := gLib2D.BLACK;
+    couleur := couleur + convert_valeur(cart.valeur);
+    cart.texte_petit := gTextLoad(couleur,font_cartes);
+    cart.texte_grand := gTextLoad(couleur,font_manche);
+
 end;
 
 function convert_text(message:string): text_graph;
@@ -143,6 +155,7 @@ case couleur OF (* Transformation byte => gColor *)
     else convert_couleur := gLib2D.DARKGRAY;
 end;
 end;
+
 
 procedure afficher_texte(message:text_graph;couleur:color_graph);
 begin
@@ -326,7 +339,7 @@ begin
     i := -1;
     text_consigne := gTextLoad(message,font_manche);
 
-    while (i<>13) do begin
+    while (i<>13) and (i<>271) do begin
         afficher_background;
         focus_joueur;
         if length(text_typing)=0 then
@@ -339,16 +352,22 @@ begin
             if (sdl_do_quit) then (* Clic sur la croix pour fermer *)
                 halt;
             i := sdl_get_keypressed;
-            if (length(text_typing)>=limit) then continue;
-            if i<>-1 then
+
+            if i>-1 then writeln('i: ',i);
+            if ((i>96) and (i<123)) or ((i>255) and (i<266)) or (i=13) or (i=271) or (i=8) then
                 c := chr(i)
             else continue;
-            if c='0' then
+            if (c='0') then
+                continue
+            else if i=8 then
+                SetLength(text_typing, max(0,Length(text_typing) - 1))
+            else if (length(text_typing)>=limit) then
                 continue
             else if (i>255) and (i<266) then
                 text_typing += intToStr(i-256)
             else if not int_seulement then
                 text_typing += c;
+            writeln('txt: ',text_typing);
         end;
         sleep(10);
     end;
