@@ -30,7 +30,7 @@ Procedure Manche(var liste:joueursArray;n:integer);
 Procedure Ascendant(liste:joueursArray);
 Procedure Descendant(liste:joueursArray);
 Procedure ComptageDePoint(var liste:joueursArray;n:integer);
-function creerjoueur(couleur:byte;colorname:string):joueur;
+function (couleur:byte;colorname:string):joueur;
 procedure creerjoueurs(var liste:joueursArray);
 Procedure Partie(var liste:joueursArray);
 
@@ -422,6 +422,7 @@ begin
     {$I+}   {restores default IO checking}
     creerjoueur.age := age;
     creerjoueur.pseudo := pseudo;
+    creerjoueur.bot:=false;
     writeln;
 end;
 
