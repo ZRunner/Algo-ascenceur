@@ -16,7 +16,7 @@ Procedure Parions(var liste:joueursArray;n:integer);
 Procedure plusJeune(var liste:joueursArray);
 Function RandomDeck:deck;
 Function InitAtout(liste:joueursArray;n:integer):carte;
-Function NombreManche(var conf:config):integer;
+Function NombreManche():integer;
 Function VerifCouleurExiste(colo:string):boolean;
 Function VerifValeurExiste(val:integer):boolean;
 Function VerifieCarteAjoueur(paquet:joueur;Choix:carte):boolean;
@@ -27,12 +27,12 @@ Procedure RetirePaquet(var Jo:joueur;choix:carte);
 Procedure OrdreJoueur(var liste:joueursArray;atout:string);
 Procedure AfficheScore(liste:joueursArray);
 Procedure Manche(var liste:joueursArray;n:integer);
-Procedure Ascendant(liste:joueursArray;conf:config);
-Procedure Descendant(liste:joueursArray;conf:config);
+Procedure Ascendant(liste:joueursArray);
+Procedure Descendant(liste:joueursArray);
 Procedure ComptageDePoint(var liste:joueursArray;n:integer);
 function creerjoueur(couleur:byte;colorname:string):joueur;
 procedure creerjoueurs(var liste:joueursArray);
-Procedure Partie(var liste:joueursArray; conf:config);
+Procedure Partie(var liste:joueursArray);
 
 implementation
 
@@ -179,7 +179,7 @@ InitAtout:=T[0];
 end;
 
 // Calcule le nombre de manches dans une partie en fonction du nombre de joueurs.
-Function NombreManche(var conf:config):integer;
+Function NombreManche():integer;
 begin
 conf.players:=InitJoueur();
 NombreManche:=round(52/conf.players);
@@ -382,10 +382,10 @@ begin
 end;
 
 //la phase ascendante
-Procedure Ascendant(liste:joueursArray;conf:config);
+Procedure Ascendant(liste:joueursArray);
 var i,x:integer;
 begin
-	x:=NombreManche(conf);
+	x:=NombreManche();
 	For i:=1 to x do
 	begin
 		distribuer(liste,i);
@@ -395,10 +395,10 @@ begin
 end;
 
 //la phase descendante
-Procedure Descendant(liste:joueursArray;conf:config);
+Procedure Descendant(liste:joueursArray);
 var i,x:integer;
 begin
-	x:=NombreManche(conf);
+	x:=NombreManche();
 	For i:=x downto 1 do
 	begin
 		distribuer(liste,i);
@@ -437,9 +437,8 @@ begin
 end;
 
 //Procedure rassemblant tout pour jouer une partie
-Procedure Partie(var liste:joueursArray; conf:config);
+Procedure Partie(var liste:joueursArray);
 Var
-	liste_cartes:cartesArray;
 	n:integer;
 begin
 	n:=InitJoueur();
@@ -449,8 +448,8 @@ begin
 	afficher_joueurs(); (* chargement/affichage des joueurs *)
 	plusJeune(liste);
 	afficher_background(); (* chargement du fond *)
-	Ascendant(liste,conf);
-	Descendant(liste,conf);
+	Ascendant(liste);
+	Descendant(liste);
 end;
 
 end.
