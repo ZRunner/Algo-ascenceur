@@ -36,6 +36,7 @@ Type joueur = Record // L'un des joueurs
     gcouleur : gColor;
     x,y,r : integer;
     pseudo_txt : gImage;
+    bot:boolean;
 end;
 
 Type joueursArray = array of joueur;
