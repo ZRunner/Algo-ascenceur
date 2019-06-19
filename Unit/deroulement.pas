@@ -1,7 +1,7 @@
 UNIT deroulement;
 
 interface
-uses fpjson, jsonparser, Intro, graph, classes, Crt, sysutils;
+uses loadconfig, Intro, graph, classes, Crt, sysutils;
 
 var d:deck;
     liste:joueursArray;
@@ -439,17 +439,16 @@ end;
 //Procedure rassemblant tout pour jouer une partie
 Procedure Partie(var liste:joueursArray; conf:config);
 Var
-	image:classes.background;
-	liste_cartes:cartes;
+	liste_cartes:cartesArray;
 	n:integer;
 begin
 	n:=InitJoueur();
 	setlength(liste, n);
 	creerjoueurs(liste);
-	liste:=load_players(liste);
+	load_players(liste);
 	afficher_joueurs(); (* chargement/affichage des joueurs *)
 	plusJeune(liste);
-	afficher_background(image); (* chargement du fond *)
+	afficher_background(); (* chargement du fond *)
 	Ascendant(liste,conf);
 	Descendant(liste,conf);
 end;
