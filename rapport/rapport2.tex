@@ -120,9 +120,9 @@ Pour commencer, voici comment est construit le code. Tout part d'un programme pr
   \item[Initjoueur:] Demande le nombre de joueurs présent dans la partie 
   \item[Initplimanche:] Permet de ramener le nombre de plis des joueurs a zéro avant la nouvelle manche
   \item[Inarray:] Vérifie la présence d'une carte dans la liste
-  \item[Init:] Crée le paquet de carte 
+  \item[Init:] Créé le paquet de carte 
   \item[Distribuer:] Distribue les cartes aux joueurs et empêche le doublon de carte
-  \item[InitAtout:] COOKIE
+  \item[InitAtout:] Permet d'initialiser la couleur de la carte de l'atout
   \item[NombreManche:] Calcul le nombre de manches nécessaires vis-à-vis du nombre de joueur
   \item[VerifcouleurExiste:] Vérifie la couleur de cartes séléctionner par le joueur
   \item[VerifvaleurExiste:] Vérifie la valeur de la carte choisie
@@ -132,13 +132,13 @@ Pour commencer, voici comment est construit le code. Tout part d'un programme pr
   \item[Pli:] A la fin d'un tour, renvoie un entier pour désigner le gagnant 
   \item[RetirePaquet:] Retire la carte du paquet une fois sélectionner 
   \item[OrdreJoueur:] Permet de determiné et d'appliquer l'ordre de jeu des joueurs pour le prochain pli
-  \item[AfficheScore:] COOKIE
+  \item[AfficheScore:] Permet d'afficher les scores de chacun à chaque fin de manche
   \item[Manche:] Applique les etats d'une manche a savoir le nombre de cartes au joueurs et l'enregistrement des paris 
   \item[Ascendant:] Donne une carte de plus a chaque joueur
   \item[Descandant:] Retire une carte a chaque joueur 
   \item[ComptageDePoint:] Compte le nombre de point associé aux joueurs 
-  \item[Creerjoueurs:] COOKIE
-  \item[Partie:] COOKIE
+  \item[Creerjoueur:] Affiche le pseudo et l'âge du joueur
+  \item[Partie:] Procédure permettant de jouer une partie (Ascendant et Descendant)
   \end{description}
   \vspace{15pt}
   
@@ -173,7 +173,7 @@ Pour commencer, voici comment est construit le code. Tout part d'un programme pr
 
 \section{Difficultés}
 	\subsection{Coeur du programme}
-	COOKIE
+	La principale difficulté rencontrée fût dans le choix des fonctions à réaliser mais surtout comment réaliser certaines fonctions. De plus, une autre difficulté était au moment de relié notre unit à l'interface graphique car les données entre les deux programmes étaient relativement différente. Nous avons également eu du mal à démarrer car les règles énoncés n'étaient pas très claires et nous avions tous compris des règles différentes, surtout au niveau du comptage des points.
 	
 	\subsection{Unité grahique}
 	La principale difficulté rencontrée lorsque nous avons commencé la partie graphique est l'installation : malgré de nombreuses heures de tests, il nous a été impossible d'utiliser la lib SDL sur nos ordinateurs personnels. Cela nous a donc forcé à la travailler uniquement depuis les postes de l'école, ralentissant la progression de cette section du programme.\\ 
