@@ -28,6 +28,21 @@ begin
 		liste[i] := CreerBot();
 end;
 
+Function ChoixCarteCouleurBot(packet:joueur;prems:carte):carte;
+var i,j:integer;
+	T:array of carte;
+begin
+	randomize;
+	Setlength(T,high(packet.cartes));
+    j := 0;
+	For i:=0 to high(packet.cartes) do
+        If carte.couleur:=prems.couleur then begin
+			T[j]:=carte;
+            j += 1;
+            end;
+    Setlength(T,j);
+	ChoixCarteCouleurBot:=T[round(random(length(T)))];
+end;
 
 
 END.
