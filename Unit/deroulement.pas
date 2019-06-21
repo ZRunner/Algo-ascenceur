@@ -108,7 +108,7 @@ begin
 		k:=-1;
 		If (liste[i].bot=false) then
 		begin
-			While (k<0) or (k>m) do
+			While (k<0) or (k>m) or (k>n) do
 			begin
 				k := StrToInt(saisir_txt('Combien de plis pensez-vous remportez ?',2,true));
 				(* 2 : pari = nombre de 2 chiffres max
