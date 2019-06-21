@@ -1,7 +1,7 @@
 UNIT deroulement;
 
 interface
-uses loadconfig, Intro, graph, classes, Crt, sysutils;
+uses loadconfig, Intro, bot, graph, classes, Crt, sysutils;
 
 var d:deck;
     liste:joueursArray;
@@ -22,7 +22,7 @@ Function VerifValeurExiste(val:integer):boolean;
 Function VerifieCarteAjoueur(paquet:joueur;Choix:carte):boolean;
 Function ChoixCarte(paquet:joueur):carte;
 Function VerifDroitDePoser(paquet:joueur;choix,prems:carte):boolean;
-Function Pli(var liste:joueursArray; atout:string):integer;
+Function Pli(var liste:joueursArray;atout:string):integer;
 Procedure RetirePaquet(var Jo:joueur;choix:carte);
 Procedure OrdreJoueur(var liste:joueursArray;atout:string);
 Procedure AfficheScore(liste:joueursArray);
@@ -30,7 +30,7 @@ Procedure Manche(var liste:joueursArray;n:integer);
 Procedure Ascendant(liste:joueursArray);
 Procedure Descendant(liste:joueursArray);
 Procedure ComptageDePoint(var liste:joueursArray;n:integer);
-function creerjoueur (couleur:byte;colorname:string):joueur;
+function creerjoueur(couleur:byte;colorname:string):joueur;
 procedure creerjoueurs(var liste:joueursArray);
 Procedure Partie(var liste:joueursArray);
 
@@ -108,9 +108,9 @@ begin
 		k:=-1;
 		If (liste[i].bot=false) then
 		begin
-			While (k<0) or (k>m) or (k>n) do
+			While (k<0) or (k>m) do
 			begin
-				k := StrToInt(saisir_txt('Combien de plis pensez-vous remporter ?',2,true));
+				k := StrToInt(saisir_txt('Combien de plis pensez-vous remportez ?',2,true));
 				(* 2 : pari = nombre de 2 chiffres max
 				* true : le joueur ne peut rentrer que des chiffres *)
 			end;
