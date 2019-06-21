@@ -28,22 +28,6 @@ begin
 		liste[i] := CreerBot();
 end;
 
-Procedure ParionsBot(var liste:joueursArray;n:integer);
-var i,k,s,m:integer;
-begin
-	s:=0;
-	m:=n+1;
-	For i:=0 to high(liste) do
-	begin
-			graph.set_joueur(liste[i]);
-			k := random(m);//bot débutant
-	liste[i].pari:=random(m+2);
-	s:=s+k;
-	m:=m-s;
-    end;
-end;
-//pas fini
-
 
 
 END.
