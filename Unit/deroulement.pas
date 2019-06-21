@@ -97,7 +97,7 @@ begin
 end;
 
 //enregistrement des paris
-Procedure Parions(var liste:joueursArray;n:integer);
+Procedure Parions(var liste:joueursArray;n:integer); //n:nb de cartes par joueur
 var i,k,s,m:integer;
 begin
 	s:=0;
@@ -106,12 +106,17 @@ begin
 	begin
         graph.set_joueur(liste[i]);
 		k:=-1;
-		While (k<0) or (k>m) do
+		If (liste[i].bot=false) then
 		begin
-			k := StrToInt(saisir_txt('Combien de plis pensez-vous remportez ?',2,true));
-			(* 2 : pari = nombre de 2 chiffres max
-			* true : le joueur ne peut rentrer que des chiffres *)
-		end;
+			While (k<0) or (k>m) do
+			begin
+				k := StrToInt(saisir_txt('Combien de plis pensez-vous remportez ?',2,true));
+				(* 2 : pari = nombre de 2 chiffres max
+				* true : le joueur ne peut rentrer que des chiffres *)
+			end;
+		end
+		Else
+			k:=random(m);
 		liste[i].pari:=k;
 		s:=s+k;
 		m:=m-s;
