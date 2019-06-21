@@ -275,8 +275,15 @@ begin
 	set_joueur(liste[0]);
     focus_joueur; //affichage en haut à gauche du joueur dont c'est le tour
 	setlength(T,high(liste));
-	T[0].couleur:=ChoixCarte(liste[0]).couleur;
-	T[0].valeur:=ChoixCarte(liste[0]).valeur;
+	If liste[0].bot = true then
+	begin
+		T[0]:=ChoixCarteBotPrems(liste[0]);
+	end
+	Else
+	begin
+		T[0].couleur:=ChoixCarte(liste[0]).couleur;
+		T[0].valeur:=ChoixCarte(liste[0]).valeur;
+	end;
 	RetirePaquet(liste[0],choix);
 	set_cartes_main(T);
 	afficher_manche; //affichage des cartes jouées au centre
@@ -287,10 +294,17 @@ begin
     focus_joueur;
 	For i:=1 to high(liste) do
 	begin
-		Repeat
-			choix.couleur:=ChoixCarte(liste[i]).couleur; //choix est dans le paquet du joueur
-			choix.valeur:=ChoixCarte(liste[i]).valeur;
-		Until VerifDroitDePoser(liste[i],choix,T[0]);
+		If liste[i].bot = false then
+		begin
+			Repeat
+				choix.couleur:=ChoixCarte(liste[i]).couleur; //choix est dans le paquet du joueur
+				choix.valeur:=ChoixCarte(liste[i]).valeur;
+			Until VerifDroitDePoser(liste[i],choix,T[0]);
+		end
+		Else
+		begin
+			choix:=ChoixCarteCouleurBot(liste[i],T[0]);
+		end;
 		RetirePaquet(liste[i],choix);
 		T[i]:=choix;
 		set_cartes_main(T);
