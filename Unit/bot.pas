@@ -45,6 +45,5 @@ end;
 //pas fini
 
 
-begin
-	conf := loadconfig.loadconfig();
+
 END.
