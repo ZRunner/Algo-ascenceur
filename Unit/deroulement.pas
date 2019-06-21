@@ -110,7 +110,7 @@ begin
 		begin
 			While (k<0) or (k>m) or (k>n) do
 			begin
-				k := StrToInt(saisir_txt('Combien de plis pensez-vous remportez ?',2,true));
+				k := StrToInt(saisir_txt('Combien de plis pensez-vous remporter ?',2,true));
 				(* 2 : pari = nombre de 2 chiffres max
 				* true : le joueur ne peut rentrer que des chiffres *)
 			end;
