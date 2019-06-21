@@ -47,5 +47,10 @@ begin
 		ChoixCarteCouleurBot:=packet.cartes[random(length(packet.cartes))];
 end;
 
+Function ChoixCarteBotPrems(packet:joueur):carte;
+Begin
+	ChoixCarteBotPrems:=packet.cartes[random(length(packet.cartes))];
+end;
+
 
 END.
