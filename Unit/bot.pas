@@ -41,7 +41,10 @@ begin
             j += 1;
             end;
     Setlength(T,j);
-	ChoixCarteCouleurBot:=T[round(random(length(T)))];
+ 	If j<>0 Then
+		ChoixCarteCouleurBot:=T[round(random(length(T)))]
+	Else
+		ChoixCarteCouleurBot:=packet.cartes[random(length(packet.cartes))];
 end;
 
 
