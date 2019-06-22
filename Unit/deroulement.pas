@@ -160,27 +160,25 @@ Begin
 	Exit(p);
 end;
 
-// n = nbr de cartes par joueur et p = nombre de players
-Function InitAtout(liste:joueursArray;n:integer):carte;
-var d:deck;
-p:integer;
-j,i:integer;
-T: array of carte;
+// Pour vérifier que l'atout n'est pas dans un seul paquet des joueurs
+Function VerifAtout(liste:joueursArray;card:carte):boolean;
+var j,i:integer;
 begin
-d:=Randomdeck;
-p:=InitJoueur();
-Distribuer(liste,p);
-i:=n*p-1;
-Setlength(T,n*p);
-For j:=0 to n*p-1 do
-Begin
-	While (i-n*p-1<=n*p-1) do
-		Begin
-		T[j]:=d[i];
-		i:=i+1;
-		end;
+    For i:=0 to high(liste) do
+        For j:=0 to high(liste[i].cartes) do
+            if ((liste[i].cartes[j].couleur = card.couleur) and (liste[i].cartes[j].valeur = card.valeur)) then exit(false);
+    Exit(true);
 end;
-InitAtout:=T[0];
+
+// n = nbr de cartes par joueur et p = nombre de players
+Function InitAtout(liste:joueursArray;x:integer):carte;
+var k:carte;
+begin
+Distribuer(liste,x);
+Repeat
+    k:=d[random(52)];
+until VerifAtout(liste,k);
+InitAtout:=k;
 end;
 
 // Calcule le nombre de manches dans une partie en fonction du nombre de joueurs.
