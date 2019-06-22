@@ -15,6 +15,7 @@ procedure distribuer(var liste:joueursArray;n:integer);
 Procedure Parions(var liste:joueursArray;n:integer);
 Procedure plusJeune(var liste:joueursArray);
 Function RandomDeck:deck;
+Function VerifAtout(liste:joueursArray;card:carte):boolean;
 Function InitAtout(liste:joueursArray;n:integer):carte;
 Function NombreManche():integer;
 Function VerifCouleurExiste(colo:string):boolean;
