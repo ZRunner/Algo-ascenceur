@@ -3,8 +3,9 @@ UNIT deroulement;
 // x= Nombre de cartes par joueurs;
 // n= Nombre de joueurs(Non bot);
 // high(liste)= Nombre de joueurs au total (Joueurs et bots)
+
 interface
-uses loadconfig, Intro, bot, graph, classes, Crt, sysutils;
+uses loadconfig, bot, graph, classes, Crt, sysutils;
 
 var d:deck;
     liste:joueursArray;
@@ -18,25 +19,25 @@ procedure distribuer(var liste:joueursArray;n:integer);
 Procedure Parions(var liste:joueursArray;n:integer);
 Procedure plusJeune(var liste:joueursArray);
 Function RandomDeck:deck;
+Function InitAtout(liste:joueursArray;x:integer):carte;
 Function VerifAtout(liste:joueursArray;card:carte):boolean;
-Function InitAtout(liste:joueursArray;n:integer):carte;
 Function NombreManche():integer;
 Function VerifCouleurExiste(colo:string):boolean;
 Function VerifValeurExiste(val:integer):boolean;
 Function VerifieCarteAjoueur(paquet:joueur;Choix:carte):boolean;
 Function ChoixCarte(paquet:joueur):carte;
 Function VerifDroitDePoser(paquet:joueur;choix,prems:carte):boolean;
-Function Pli(var liste:joueursArray;atout:string):integer;
+Function BestPli(T:array of carte;atout:carte):integer;
 Procedure RetirePaquet(var Jo:joueur;choix:carte);
-Procedure OrdreJoueur(var liste:joueursArray;atout:string);
+Procedure OrdreJoueur(var liste:joueursArray;atout:carte;C:Array of carte);
 Procedure AfficheScore(liste:joueursArray);
-Procedure Manche(var liste:joueursArray;n:integer);
-Procedure Ascendant(liste:joueursArray);
-Procedure Descendant(liste:joueursArray);
+//Procedure Manche(var liste:joueursArray;n:integer);
+//Procedure Ascendant(liste:joueursArray);
+//Procedure Descendant(liste:joueursArray);
 Procedure ComptageDePoint(var liste:joueursArray;n:integer);
-Function creerjoueur(couleur:byte;colorname:string):joueur;
-Procedure creerjoueurs(var liste:joueursArray);
-Procedure Partie(var liste:joueursArray);
+function creerjoueur(couleur:byte;colorname:string):joueur;
+procedure creerjoueurs(var liste:joueursArray);
+//Procedure Partie(var liste:joueursArray);
 
 implementation
 
@@ -164,25 +165,25 @@ Begin
 	Exit(p);
 end;
 
-// Pour vérifier que l'atout n'est pas dans un seul paquet des joueurs
-Function VerifAtout(liste:joueursArray;card:carte):boolean;
-var j,i:integer;
-begin
-    For i:=0 to high(liste) do
-        For j:=0 to high(liste[i].cartes) do
-            if ((liste[i].cartes[j].couleur = card.couleur) and (liste[i].cartes[j].valeur = card.valeur)) then exit(false);
-    Exit(true);
-end;
-
-// n = nbr de cartes par joueur et p = nombre de players
+// x = nbr de cartes par joueur 
 Function InitAtout(liste:joueursArray;x:integer):carte;
 var k:carte;
 begin
 Distribuer(liste,x);
 Repeat
-    k:=d[random(52)];
+	k:=d[random(52)];
 until VerifAtout(liste,k);
 InitAtout:=k;
+end;
+
+// Pour vérifier que l'atout n'est pas dans un seul paquet des joueurs
+Function VerifAtout(liste:joueursArray;card:carte):boolean;
+var j,i:integer;
+begin
+	For i:=0 to high(liste) do
+		For j:=0 to high(liste[i].cartes) do
+			if ((liste[i].cartes[j].couleur = card.couleur) and (liste[i].cartes[j].valeur = card.valeur)) then exit(false);
+	Exit(true);
 end;
 
 // Calcule le nombre de manches dans une partie en fonction du nombre de joueurs.
@@ -264,60 +265,13 @@ begin
 	end;
 end;
 
-//pour un tour, renvoit un entier qui est le numéro du gagnant dans la liste actuelle
-Function Pli(var liste:joueursArray; atout:string):integer;
-var
-	i:integer;
-	T:array of carte;
-	choix:carte;
-	best:integer;
+//Fonction qui renvoit le numéro du joueur dont la carte remporte le pli
+Function BestPli(T:array of carte;atout:carte):integer;
+var i,best:integer;
 begin
-	set_deck(liste[0].cartes);
-	afficher_cartes;
-	set_joueur(liste[0]);
-    focus_joueur; //affichage en haut à gauche du joueur dont c'est le tour
-	setlength(T,high(liste));
-	If liste[0].bot = true then
+	best:=0; //initialisation à la première carte du pli
+	For i:=0 to high(T) do
 	begin
-		T[0]:=ChoixCarteBotPrems(liste[0]);
-	end
-	Else
-	begin
-		T[0].couleur:=ChoixCarte(liste[0]).couleur;
-		T[0].valeur:=ChoixCarte(liste[0]).valeur;
-	end;
-	RetirePaquet(liste[0],choix);
-	set_cartes_main(T);
-	afficher_manche; //affichage des cartes jouées au centre
-	best:=0;
-	set_deck(liste[1].cartes);
-	afficher_cartes;
-	set_joueur(liste[1]);
-    focus_joueur;
-	For i:=1 to high(liste) do
-	begin
-		If liste[i].bot = false then
-		begin
-			Repeat
-				choix.couleur:=ChoixCarte(liste[i]).couleur; //choix est dans le paquet du joueur
-				choix.valeur:=ChoixCarte(liste[i]).valeur;
-			Until VerifDroitDePoser(liste[i],choix,T[0]);
-		end
-		Else
-		begin
-			choix:=ChoixCarteCouleurBot(liste[i],T[0]);
-		end;
-		RetirePaquet(liste[i],choix);
-		T[i]:=choix;
-		set_cartes_main(T);
-		afficher_manche;
-		if i<>high(liste) then
-		begin
-			set_deck(liste[i+1].cartes);
-			afficher_cartes;
-			set_joueur(liste[i+1]);
-			focus_joueur; //affichage en haut à gauche du joueur dont c'est le tour
-		end;
 		If (T[i].couleur=T[0].couleur) then
 		begin
 			If (T[i].couleur=T[best].couleur) then
@@ -325,29 +279,26 @@ begin
 		end
 		Else
 		begin
-			If (T[i].couleur=T[best].couleur) then  //si atout déjà posé
-				If (T[i].valeur>T[best].valeur) then best:=i;
+			If (T[i].couleur=atout.couleur) then  
+			begin
+				If T[i].couleur=T[best].couleur then //si atout déjà posé
+				begin
+					If (T[i].valeur>T[best].valeur) then best:=i;
+				end
+				Else best:=i; //premier atout posé
+			end;
 		end;
 	end;
-	Exit(best); //voir pour un effet sur T[best]
-end;
-
-//Function retrouvant dans la liste le pseudo du gagnant.
-Function RecherchePseudoGagnant(liste:joueursArray;atout:string):joueur;
-var i: integer;
-begin
-For i:=1 to high(liste) do
-	If Pli(liste,atout)= i then
-	Exit(liste[i]);
+	Exit(best);
 end;
 
 // Procédure permettant d'afficher l'ordre des joueurs pour le pli suivant.
-Procedure OrdreJoueur(var liste:joueursArray;atout:string);
+Procedure OrdreJoueur(var liste:joueursArray;atout:carte;C:Array of carte);
 var i,j,x:integer;
 T:joueursArray;
 begin
 	setlength(T,high(liste)+1);
-	T[0]:=RecherchePseudoGagnant(liste,atout);
+	T[0]:=liste[BestPli(C,atout)];
 	For i:=1 to high(liste) do
 		If T[0].pseudo=liste[i].pseudo Then x:=i;
 	j:=x+1;
@@ -385,48 +336,6 @@ end;
 	InitPliManche(liste);
 end;
 
-//pour une manche
-Procedure Manche(var liste:joueursArray;n:integer); //n : nombre de cartes par joueur au début de la manche
-var i:integer; atout:carte; color:string;
-begin
-	atout:=InitAtout(liste,n);
-	afficher_atout(atout); (* chargement de la couleur de l'atout *)
-	color:=atout.couleur;
-	Parions(liste,n);
-	For i:=1 to n do //premier joueur = gagnant tour précédent
-	begin
-		OrdreJoueur(liste,color);
-		liste[0].PliManche:=liste[0].PliManche+1;
-	end;
-	ComptageDePoint(liste,n);
-	AfficheScore(liste);
-end;
-
-//la phase ascendante
-Procedure Ascendant(liste:joueursArray);
-var i,x:integer;
-begin
-	x:=NombreManche();
-	For i:=1 to x do
-	begin
-		distribuer(liste,i);
-		Manche(liste,i);
-	end;
-
-end;
-
-//la phase descendante
-Procedure Descendant(liste:joueursArray);
-var i,x:integer;
-begin
-	x:=NombreManche();
-	For i:=x downto 1 do
-	begin
-		distribuer(liste,i);
-		Manche(liste,i);
-	end;
-end;
-
 // Création d'un joueur, avec son pseudo, sa couleur et son age
 function creerjoueur(couleur:byte;colorname:string):joueur;
 var age:integer;pseudo:string;ok:boolean;
@@ -458,22 +367,6 @@ begin
     normvideo;
 end;
 
-//Procedure rassemblant tout pour jouer une partie
-Procedure Partie(var liste:joueursArray);
-Var
-	n:integer;
 begin
-	n:=InitJoueur();
-	setlength(liste, conf.players);
-	creerjoueurs(liste);
-	If (n<conf.players) Then
-		PartieBot(n,liste);
-	load_players(liste);
-	afficher_joueurs(); (* chargement/affichage des joueurs *)
-	plusJeune(liste);
-	afficher_background(); (* chargement du fond *)
-	Ascendant(liste);
-	Descendant(liste);
-end;
-
+	d:=init;
 end.
