@@ -1,5 +1,8 @@
 UNIT deroulement;
 
+// x= Nombre de cartes par joueurs;
+// n= Nombre de joueurs(Non bot);
+// high(liste)= Nombre de joueurs au total (Joueurs et bots)
 interface
 uses loadconfig, Intro, bot, graph, classes, Crt, sysutils;
 
@@ -31,8 +34,8 @@ Procedure Manche(var liste:joueursArray;n:integer);
 Procedure Ascendant(liste:joueursArray);
 Procedure Descendant(liste:joueursArray);
 Procedure ComptageDePoint(var liste:joueursArray;n:integer);
-function creerjoueur(couleur:byte;colorname:string):joueur;
-procedure creerjoueurs(var liste:joueursArray);
+Function creerjoueur(couleur:byte;colorname:string):joueur;
+Procedure creerjoueurs(var liste:joueursArray);
 Procedure Partie(var liste:joueursArray);
 
 implementation
