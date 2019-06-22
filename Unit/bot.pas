@@ -20,10 +20,12 @@ end;
 Procedure PartieBot(n:integer; var liste:joueursArray); //n nombre de joueurs déjà enregistrés
 var nb,i:integer;
 begin
-	repeat
+	nb:=conf.players; 
+	while (nb+n>conf.players) do
+	begin
 		Writeln('Combien voulez-vous d''IA?');
 		Readln(nb)
-	until(nb+n<=conf.players);
+	end;
 	For i := n+1 to n+nb do
 		liste[i] := CreerBot();
 end;
