@@ -462,8 +462,10 @@ Var
 	n:integer;
 begin
 	n:=InitJoueur();
-	setlength(liste, n);
+	setlength(liste, conf.players);
 	creerjoueurs(liste);
+	If (n<conf.players) Then
+		PartieBot(n,liste);
 	load_players(liste);
 	afficher_joueurs(); (* chargement/affichage des joueurs *)
 	plusJeune(liste);
