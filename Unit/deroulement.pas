@@ -30,7 +30,6 @@ Function VerifDroitDePoser(paquet:joueur;choix,prems:carte):boolean;
 Function BestPli(T:array of carte;atout:carte):integer;
 Procedure RetirePaquet(var Jo:joueur;choix:carte);
 Procedure OrdreJoueur(var liste:joueursArray;atout:carte;C:Array of carte);
-Procedure AfficheScore(liste:joueursArray);
 //Procedure Manche(var liste:joueursArray;n:integer);
 //Procedure Ascendant(liste:joueursArray);
 //Procedure Descendant(liste:joueursArray);
@@ -309,16 +308,6 @@ begin
 		if j=high(liste) then j:=0
 	end;
 end;
-
-//pour afficher les scores en chaque fin de manche
-Procedure AfficheScore(liste:joueursArray);
-Var i:integer;
-begin
-	For i:=0 to high(liste) do
-	begin
-		writeln(liste[i].pseudo, ' : ', liste[i].point);
-	end;
-end; //à retoucher avec Arthur pour l'adapter au graphisme
 
 // n est le nombre de carte distribuer par joueur
 Procedure ComptageDePoint(var liste:joueursArray;n:integer);
