@@ -128,7 +128,7 @@ If i>high(liste) Then
 			Inc(x,-1); //car on démarre la prochaine manche avec le même x que la manche d'avant (qui a été incrémenter pour montrer le changement de pli puis de manche)
 			Inc(Ph);
 		end; //la phase ascendante est finie -> passage phase descendante
-		
+		If (m>NombreManche) and (Ph=2) Then break; //sortie de la boucle
 		(*nouveaux paramètres pour l'affichage*)
 
 	For j:=0 to high(liste[i].cartes) do
