@@ -101,7 +101,7 @@ begin
 end;
 
 //enregistrement des paris
-Procedure Parions(var liste:joueurs;n:integer;var s,m:integer); //n:nb de cartes par joueur, s:somme des paris et m:nb max qu'il reste à parier
+Procedure Parions(var liste:joueur;n:integer;var s,m:integer); //n:nb de cartes par joueur, s:somme des paris et m:nb max qu'il reste à parier
 var i,k:integer;
 begin
 	k:=-1;
