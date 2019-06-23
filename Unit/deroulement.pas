@@ -33,7 +33,7 @@ Procedure OrdreJoueur(var liste:joueursArray;atout:carte;C:Array of carte);
 //Procedure Manche(var liste:joueursArray;n:integer);
 //Procedure Ascendant(liste:joueursArray);
 //Procedure Descendant(liste:joueursArray);
-Procedure ComptageDePoint(var liste:joueursArray;n:integer);
+Procedure ComptageDePoint(var liste:joueursArray);
 function creerjoueur(couleur:byte;colorname:string):joueur;
 procedure creerjoueurs(var liste:joueursArray);
 //Procedure Partie(var liste:joueursArray);
@@ -310,8 +310,8 @@ begin
 end;
 
 // n est le nombre de carte distribuer par joueur
-Procedure ComptageDePoint(var liste:joueursArray;n:integer);
-var i:integer; conf:config;
+Procedure ComptageDePoint(var liste:joueursArray);
+var i:integer; 
 begin
 conf.win_defaut:=10;
 conf.win:=2;
