@@ -16,7 +16,7 @@ Procedure InitPliManche(var liste:joueursArray);
 function inarray(liste:array of carte;card:carte):boolean;
 function init:deck;
 procedure distribuer(var liste:joueursArray;n:integer);
-Procedure Parions(var liste:joueursArray;n:integer);
+Procedure Parions(var liste:joueursArray;n:integer; var s,m:integer);
 Procedure plusJeune(var liste:joueursArray);
 Function RandomDeck:deck;
 Function InitAtout(liste:joueursArray;x:integer):carte;
@@ -101,30 +101,25 @@ begin
 end;
 
 //enregistrement des paris
-Procedure Parions(var liste:joueursArray;n:integer); //n:nb de cartes par joueur
-var i,k,s,m:integer;
+Procedure Parions(var liste:joueurs;n:integer;var s,m:integer); //n:nb de cartes par joueur, s:somme des paris et m:nb max qu'il reste à parier
+var i,k;
 begin
-	s:=0;
-	m:=n+1;
-	For i:=0 to high(liste) do
+	k:=-1;
+	If (liste.bot=false) then
 	begin
-        graph.set_joueur(liste[i]);
-		k:=-1;
-		If (liste[i].bot=false) then
+		While (k<0) or (k>m) do
 		begin
-			While (k<0) or (k>m) do
-			begin
-				k := StrToInt(saisir_txt('Combien de plis pensez-vous remportez ?',2,true));
-				(* 2 : pari = nombre de 2 chiffres max
-				* true : le joueur ne peut rentrer que des chiffres *)
-			end;
-		end
-		Else
-			k:=random(m);
-		liste[i].pari:=k;
-		s:=s+k;
-		m:=m-s;
-	end;
+			k := StrToInt(saisir_txt('Combien de plis pensez-vous remportez ?',2,true));
+			(* 2 : pari = nombre de 2 chiffres max
+			* true : le joueur ne peut rentrer que des chiffres *)
+		end;
+	end
+	Else
+		k:=random(m);
+	liste.pari:=k;
+	s:=s+k;
+	m:=m-s;
+end;
 end;
 
 //changer la liste avec le premier joueur premier liste au début de la partie
