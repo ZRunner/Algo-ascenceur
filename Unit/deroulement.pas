@@ -16,7 +16,7 @@ Procedure InitPliManche(var liste:joueursArray);
 function inarray(liste:array of carte;card:carte):boolean;
 function init:deck;
 procedure distribuer(var liste:joueursArray;n:integer);
-Procedure Parions(var liste:joueursArray;n:integer; var s,m:integer);
+Procedure Parions(var liste:joueur;n:integer;var s,m:integer);
 Procedure plusJeune(var liste:joueursArray);
 Function RandomDeck:deck;
 Function InitAtout(liste:joueursArray;x:integer):carte;
@@ -119,7 +119,6 @@ begin
 	liste.pari:=k;
 	s:=s+k;
 	m:=m-s;
-end;
 end;
 
 //changer la liste avec le premier joueur premier liste au début de la partie

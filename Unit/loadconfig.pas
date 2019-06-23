@@ -9,7 +9,7 @@ interface
 
 uses classes, sysutils;
 
-function loadconfig(fichier:string='config.txt'):classes.config;
+function loadconf(fichier:string='config.txt'):classes.config;
 
 
 
@@ -17,7 +17,7 @@ function loadconfig(fichier:string='config.txt'):classes.config;
 
 implementation
 
-function loadconfig(fichier:string='config.txt'):classes.config;
+function loadconf(fichier:string='config.txt'):classes.config;
 var fic:text;
     ligne:unicodestring;
     opt,val:string;
@@ -42,13 +42,13 @@ begin
             else
                 val += c;
         case opt of
-            'max_players' : loadconfig.players := StrToInt(val);
-            'win_default' : loadconfig.win_defaut := StrToInt(val);
-            'win' : loadconfig.win := StrToInt(val);
-            'loose' : loadconfig.loose := StrToInt(val);
-            'min_age' : loadconfig.min_age := StrToInt(val);
-            'default_window' : loadconfig.default_window_size := StrToInt(val);
-            'max_age' : loadconfig.max_age := StrToInt(val);
+            'max_players' : loadconf.players := StrToInt(val);
+            'win_default' : loadconf.win_defaut := StrToInt(val);
+            'win' : loadconf.win := StrToInt(val);
+            'loose' : loadconf.loose := StrToInt(val);
+            'min_age' : loadconf.min_age := StrToInt(val);
+            'default_window' : loadconf.default_window_size := StrToInt(val);
+            'max_age' : loadconf.max_age := StrToInt(val);
         end;
     until eof(fic);
     close(fic);
