@@ -22,21 +22,13 @@ Function RandomDeck:deck;
 Function InitAtout(liste:joueursArray;x:integer):carte;
 Function VerifAtout(liste:joueursArray;card:carte):boolean;
 Function NombreManche():integer;
-Function VerifCouleurExiste(colo:string):boolean;
-Function VerifValeurExiste(val:integer):boolean;
-Function VerifieCarteAjoueur(paquet:joueur;Choix:carte):boolean;
-Function ChoixCarte(paquet:joueur):carte;
 Function VerifDroitDePoser(paquet:joueur;choix,prems:carte):boolean;
 Function BestPli(T:array of carte;atout:carte):integer;
 Procedure RetirePaquet(var Jo:joueur;choix:carte);
 Procedure OrdreJoueur(var liste:joueursArray;atout:carte;C:Array of carte);
-//Procedure Manche(var liste:joueursArray;n:integer);
-//Procedure Ascendant(liste:joueursArray);
-//Procedure Descendant(liste:joueursArray);
 Procedure ComptageDePoint(var liste:joueursArray);
 function creerjoueur(couleur:byte;colorname:string):joueur;
 procedure creerjoueurs(var liste:joueursArray);
-//Procedure Partie(var liste:joueursArray);
 
 implementation
 
@@ -188,49 +180,6 @@ If (conf.players=2) or (conf.players=4) then
 NombreManche:=NombreManche-1;
 end;
 
-//Fonction pour vérifier si la couleur choisi par le joueur sur le terminal existe
-Function VerifCouleurExiste(colo:string):boolean;
-begin
-	If (colo='trefle') Then VerifCouleurExiste:=true
-	Else If (colo='pique') Then VerifCouleurExiste:=true
-	Else If (colo='coeur') Then VerifCouleurExiste:=true
-	Else If (colo='carreau') Then VerifCouleurExiste:=true
-	Else VerifCouleurExiste:=false;
-end;
-
-//function vérifiant si la valeur de la carte existe
-Function VerifValeurExiste(val:integer):boolean;
-begin
-	If (val>0) and (val<14) then VerifValeurExiste:=true
-	Else VerifValeurExiste:=false;
-end;
-
-//Fonction vérifiant carte est dans le paquet du joueur choisi
-Function VerifieCarteAjoueur(paquet:joueur;Choix:carte):boolean;
-var i:integer;
-begin
-	VerifieCarteAjoueur:=false;
-	For i:=0 to high(paquet.cartes) do
-	begin
-		if (Choix.couleur=paquet.cartes[i].couleur) and (Choix.valeur=paquet.cartes[i].valeur) Then VerifieCarteAjoueur:=true;
-	end;
-end;
-
-//Fonction qui demande et renvoit le choix d'une carte par un joueur dans son paquet
-Function ChoixCarte(paquet:joueur):carte;
-begin
-	Repeat
-		Repeat
-			writeln('Couleur de la carte que vous voulez jouer :');
-			readln(ChoixCarte.couleur);
-		Until VerifCouleurExiste(ChoixCarte.couleur); //vérifier couleur choisie existe
-		Repeat
-			writeln('Valeur de cette dernière');
-			readln(ChoixCarte.valeur);
-		Until VerifValeurExiste(ChoixCarte.valeur); //vérifier que la carte est bien entre 1 et roi (13)
-	Until VerifieCarteAjoueur(paquet,ChoixCarte); //vérifie que la carte peut être jouer par le joueur
-end;
-
 //vérifie si la carte peut être jouer en fonction du jeu et de la première carte
 Function VerifDroitDePoser(paquet:joueur;choix,prems:carte):boolean;
 var i:integer;
@@ -349,6 +298,53 @@ begin
         liste[i] := creerjoueur(cls[i],clsn[i]);
     normvideo;
 end;
+
+(*------------------------------------------------------
+ * fonctions inutiles depuis l'utilisation du graphisme
+ * ----------------------------------------------------- *)
+//Fonction pour vérifier si la couleur choisi par le joueur sur le terminal existe
+Function VerifCouleurExiste(colo:string):boolean;
+begin
+	If (colo='trefle') Then VerifCouleurExiste:=true
+	Else If (colo='pique') Then VerifCouleurExiste:=true
+	Else If (colo='coeur') Then VerifCouleurExiste:=true
+	Else If (colo='carreau') Then VerifCouleurExiste:=true
+	Else VerifCouleurExiste:=false;
+end;
+
+//function vérifiant si la valeur de la carte existe
+Function VerifValeurExiste(val:integer):boolean;
+begin
+	If (val>0) and (val<14) then VerifValeurExiste:=true
+	Else VerifValeurExiste:=false;
+end;
+
+//Fonction vérifiant carte est dans le paquet du joueur choisi
+Function VerifieCarteAjoueur(paquet:joueur;Choix:carte):boolean;
+var i:integer;
+begin
+	VerifieCarteAjoueur:=false;
+	For i:=0 to high(paquet.cartes) do
+	begin
+		if (Choix.couleur=paquet.cartes[i].couleur) and (Choix.valeur=paquet.cartes[i].valeur) Then VerifieCarteAjoueur:=true;
+	end;
+end;
+
+//Fonction qui demande et renvoit le choix d'une carte par un joueur dans son paquet
+Function ChoixCarte(paquet:joueur):carte;
+begin
+	Repeat
+		Repeat
+			writeln('Couleur de la carte que vous voulez jouer :');
+			readln(ChoixCarte.couleur);
+		Until VerifCouleurExiste(ChoixCarte.couleur); //vérifier couleur choisie existe
+		Repeat
+			writeln('Valeur de cette dernière');
+			readln(ChoixCarte.valeur);
+		Until VerifValeurExiste(ChoixCarte.valeur); //vérifier que la carte est bien entre 1 et roi (13)
+	Until VerifieCarteAjoueur(paquet,ChoixCarte); //vérifie que la carte peut être jouer par le joueur
+end;
+(*---------------------------------------------------------------------------*)
 
 begin
 	d:=init;

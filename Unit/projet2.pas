@@ -1,6 +1,6 @@
 program ProjetAscenseur;
 
-uses loadconfig, Intro, bot, graph, classes,  deroulement, Crt, sysutils;
+uses loadconfig, Intro, bot, graph, classes, deroulement, Crt, sysutils;
 
 var 
 	n:integer; //nombre de joueurs non bots
@@ -71,7 +71,8 @@ begin
 If  boo=true Then
 begin
 		besoin_carte := True;
-		If choix.valeur = -1 then continue;
+		If (choix.valeur = -1) then continue;
+		If (i<>0) and (VerifDroitDePoser(liste[i],choix,C[0])=false) Then continue;
 			RetirePaquet(liste[i],choix);
 			convert_carte(choix);
 			C[i]:=choix;
